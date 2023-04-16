@@ -16,13 +16,13 @@ const getJobById = (req, res, next) => {
 };
 
 //get job by id => /api/jobs/${user.id}
-const getJobByUserId = (req, res, next) => {
+const getJobsByUserId = (req, res, next) => {
   const userId = req.params.uid;
   const jobs = dummy_jobs.filter((j) => {
     return j.creator.id === userId;
   });
 
-  if (jobs.length === 0) {
+  if (!jobs || jobs.length === 0) {
     return next(
       new HttpError("Could not find a job for the provided user id.", 404)
     );
@@ -67,8 +67,10 @@ const createJob = (req, res, next) => {
   res.status(201).json({ job: createdJob });
 };
 
+//update job by Id
 const updateJobById = (req, res, next) => {
   const jobId = req.params.jid;
+  //properties that the user can update from our user object.
   const {
     title,
     location,
@@ -81,9 +83,13 @@ const updateJobById = (req, res, next) => {
     creator,
   } = req.body;
 
+  //don't manipulate original array - create shallow copy.
   const updatedJob = { ...dummy_jobs.find((j) => j.id === jobId) };
+
+  //find the index where the job we want to update is.
   const jobIndex = dummy_jobs.findIndex((j) => j.id === jobId);
 
+  //new field data
   updatedJob.title = title;
   updatedJob.location = location;
   updatedJob.salary = salary;
@@ -94,18 +100,22 @@ const updateJobById = (req, res, next) => {
   updatedJob.jobType = jobType;
   updatedJob.creator = creator;
 
+  //the job at said index will be the updated job (which we find by id).
   dummy_jobs[jobIndex] = updatedJob;
   res.status(200).json({ job: updatedJob });
 };
 
+//delete job by Id
 const deleteJobById = (req, res, next) => {
+  //request params for /:jid
   const jobId = req.params.jid;
+  // simple filter function
   dummy_jobs = dummy_jobs.filter((job) => job.id !== jobId);
   res.status(200).json({ message: "deleted a job" });
 };
 
 exports.getJobById = getJobById;
-exports.getJobByUserId = getJobByUserId;
+exports.getJobsByUserId = getJobsByUserId;
 exports.createJob = createJob;
 exports.updateJobById = updateJobById;
 exports.deleteJobById = deleteJobById;

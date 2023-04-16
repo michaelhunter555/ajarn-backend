@@ -6,7 +6,7 @@ const jobsControllers = require("../controllers/jobs-controllers");
 router.get("/:jid", jobsControllers.getJobById);
 
 //GET job by userId
-router.get("/user/:uid", jobsControllers.getJobByUserId);
+router.get("/user/:uid", jobsControllers.getJobsByUserId);
 
 //POST job
 router.post("/", jobsControllers.createJob);

@@ -1,14 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { DUMMY_USERS_LIST } = require("../dummy_data/dummy_users");
+const usersController = require("../controllers/users-controller");
 
-router.get("/:uid", (req, res, next) => {
-  const userId = req.params.uid;
-  const users = DUMMY_USERS_LIST.find((u) => {
-    return u.id === userId;
-  });
-
-  res.json({ users });
-});
+//GET find user by id
+router.get("/:uid", usersController.getUserById);
+//POST sign-up post
+router.post("/sign-up", usersController.signup);
+//POST login
+router.post("/login", usersController.login);
+//PATCH add credits
+router.patch("/:uid/add-credits", usersController.addCredits);
 
 module.exports = router;
