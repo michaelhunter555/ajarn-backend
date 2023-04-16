@@ -1,9 +1,10 @@
-const SINGLE_DUMMY_USERS = [
+let SINGLE_DUMMY_USERS = [
   {
     id: "u1",
     name: "John Doe",
     nationality: "American",
     location: "Bangkok",
+    credits: 0,
     education: "Bachelor of Education, Chulalongkorn University",
     workExperience: "5 years teaching experience",
     interests: ["Teaching", "Traveling", "Photography"],
@@ -44,11 +45,12 @@ const SINGLE_DUMMY_USERS = [
   },
 ];
 
-const DUMMY_USERS_LIST = [
+let DUMMY_USERS_LIST = [
   {
     id: "u1",
     name: "John Doe",
     image: "John",
+    credits: 0,
     location: "Phuket",
     nationality: "American",
     education: "Bachelor of Education, Chulalongkorn University",
@@ -86,6 +88,7 @@ const DUMMY_USERS_LIST = [
     id: "u2",
     name: "Michael Hunter",
     image: "MichaelHunter",
+    credits: 0,
     location: "Bangkok",
     nationality: "Jamaican",
     education: "Bachelor of Arts, Temple University",
@@ -111,6 +114,7 @@ const DUMMY_USERS_LIST = [
     id: "u3",
     name: "Bob McFarland",
     image: "Bob",
+    credits: 1,
     location: "Bangkok",
     nationality: "Swiss",
     education: "Bachelor of journalism, Harvard",
@@ -147,6 +151,7 @@ const DUMMY_USERS_LIST = [
     id: "u4",
     name: "Janitha Willdubs",
     image: "Janitha",
+    credits: 0,
     location: "Chiang Mai",
     nationality: "English",
     education: "Bachelor of Education, Khao Saun University",

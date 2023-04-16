@@ -1,4 +1,4 @@
-const dummy_jobs = [
+let dummy_jobs = [
   {
     id: "1",
     title: "Native ESL Teacher",

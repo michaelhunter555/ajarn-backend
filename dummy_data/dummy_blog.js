@@ -1,4 +1,4 @@
-export const DUMMY_BLOG = [
+let DUMMY_BLOG = [
   {
     id: "1",
     title: "Top 10 Tips for New Teachers",

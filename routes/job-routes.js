@@ -11,4 +11,10 @@ router.get("/user/:uid", jobsControllers.getJobByUserId);
 //POST job
 router.post("/", jobsControllers.createJob);
 
+//update jobById
+router.patch("/:jid", jobsControllers.updateJobById);
+
+//delete jobById
+router.delete("/:jid", jobsControllers.deleteJobById);
+
 module.exports = router;

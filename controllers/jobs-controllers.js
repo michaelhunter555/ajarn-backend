@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
-const dummy_jobs = require("../dummy_data/dummy_jobs");
+let dummy_jobs = require("../dummy_data/dummy_jobs");
+const { v4: uuidv4 } = require("uuid");
 
 //get job by id => /api/jobs/${job.id}
 const getJobById = (req, res, next) => {
@@ -34,7 +35,6 @@ const getJobByUserId = (req, res, next) => {
 const createJob = (req, res, next) => {
   //list of expected fields for every job post
   const {
-    id,
     title,
     location,
     salary,
@@ -48,7 +48,7 @@ const createJob = (req, res, next) => {
 
   //in the future for google maps note that location will need lat & lng key.
   const createdJob = {
-    id,
+    id: uuidv4(),
     title,
     location,
     salary,
@@ -67,6 +67,45 @@ const createJob = (req, res, next) => {
   res.status(201).json({ job: createdJob });
 };
 
+const updateJobById = (req, res, next) => {
+  const jobId = req.params.jid;
+  const {
+    title,
+    location,
+    salary,
+    requirements,
+    description,
+    hours,
+    workPermit,
+    jobType,
+    creator,
+  } = req.body;
+
+  const updatedJob = { ...dummy_jobs.find((j) => j.id === jobId) };
+  const jobIndex = dummy_jobs.findIndex((j) => j.id === jobId);
+
+  updatedJob.title = title;
+  updatedJob.location = location;
+  updatedJob.salary = salary;
+  updatedJob.requirements = requirements;
+  updatedJob.description = description;
+  updatedJob.hours = hours;
+  updatedJob.workPermit = workPermit;
+  updatedJob.jobType = jobType;
+  updatedJob.creator = creator;
+
+  dummy_jobs[jobIndex] = updatedJob;
+  res.status(200).json({ job: updatedJob });
+};
+
+const deleteJobById = (req, res, next) => {
+  const jobId = req.params.jid;
+  dummy_jobs = dummy_jobs.filter((job) => job.id !== jobId);
+  res.status(200).json({ message: "deleted a job" });
+};
+
 exports.getJobById = getJobById;
 exports.getJobByUserId = getJobByUserId;
 exports.createJob = createJob;
+exports.updateJobById = updateJobById;
+exports.deleteJobById = deleteJobById;
