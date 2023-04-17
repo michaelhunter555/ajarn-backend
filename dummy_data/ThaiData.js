@@ -1,5 +1,5 @@
 //current list of cities
-export const thaiCities = [
+let thaiCities = [
   "Bangkok",
   "Chiang Mai",
   "Phuket",
@@ -34,7 +34,7 @@ export const thaiCities = [
 ];
 
 //list of fulltime incomes
-export const fullTimeSalaries = [
+let fullTimeSalaries = [
   "at least THB 20k/mo.",
   "THB 30k/mo.",
   "THB 40k/mo.",
@@ -47,7 +47,7 @@ export const fullTimeSalaries = [
 ];
 
 //list of partime incomes.
-export const partTimeSalaries = [
+let partTimeSalaries = [
   "at least 250THB/hour",
   "THB 300/hour",
   "THB 400/hour",
@@ -60,7 +60,7 @@ export const partTimeSalaries = [
 ];
 
 //desired qualifications
-export const coreJobRequirements = [
+let coreJobRequirements = [
   "BA",
   "BSc",
   "Certificate",
@@ -75,7 +75,7 @@ export const coreJobRequirements = [
 ];
 
 //github pulled list of nationalities
-export const nationalities = [
+let nationalities = [
   "American",
   "British",
   "Australian",
@@ -283,3 +283,11 @@ export const nationalities = [
   "Zambian",
   "Zimbabwean",
 ];
+
+module.exports = {
+  thaiCities,
+  fullTimeSalaries,
+  partTimeSalaries,
+  coreJobRequirements,
+  nationalities,
+};

@@ -1,6 +1,11 @@
 const HttpError = require("../models/http-error");
 let dummy_jobs = require("../dummy_data/dummy_jobs");
 const { v4: uuidv4 } = require("uuid");
+const { validationResult } = require("express-validator");
+
+const getAllJobs = (req, res, next) => {
+  res.json({ jobs: dummy_jobs });
+};
 
 //get job by id => /api/jobs/${job.id}
 const getJobById = (req, res, next) => {
@@ -33,6 +38,13 @@ const getJobsByUserId = (req, res, next) => {
 
 //job POST
 const createJob = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new Error("invalid inputs passed, please check your data.");
+  }
+
   //list of expected fields for every job post
   const {
     title,
@@ -49,6 +61,7 @@ const createJob = (req, res, next) => {
   //in the future for google maps note that location will need lat & lng key.
   const createdJob = {
     id: uuidv4(),
+    datePosted: new Date().toISOString(),
     title,
     location,
     salary,
@@ -113,7 +126,7 @@ const deleteJobById = (req, res, next) => {
   dummy_jobs = dummy_jobs.filter((job) => job.id !== jobId);
   res.status(200).json({ message: "deleted a job" });
 };
-
+exports.getAllJobs = getAllJobs;
 exports.getJobById = getJobById;
 exports.getJobsByUserId = getJobsByUserId;
 exports.createJob = createJob;

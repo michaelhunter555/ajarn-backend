@@ -10,11 +10,7 @@ let dummy_jobs = [
     datePosted: "2023-02-28",
     hours: "Full-time",
     workPermit: true,
-    jobType: {
-      basic: false,
-      flare: false,
-      featured: true,
-    },
+    jobType: "featured",
     creator: {
       id: "u1",
       company: "Sine Education",
@@ -44,11 +40,7 @@ let dummy_jobs = [
     datePosted: "2023-02-27",
     hours: "Full-time",
     workPermit: true,
-    jobType: {
-      basic: false,
-      flare: false,
-      featured: false,
-    },
+    jobType: "flare",
     creator: {
       id: "u2",
       company: "BFits",
@@ -70,11 +62,7 @@ let dummy_jobs = [
     datePosted: "2023-02-27",
     hours: "Full-time",
     workPermit: false,
-    jobType: {
-      basic: false,
-      flare: false,
-      featured: false,
-    },
+    jobType: "basic",
     creator: {
       id: "u1",
       company: "St. Johns Intl'",

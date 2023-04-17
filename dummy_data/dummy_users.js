@@ -42,6 +42,7 @@ let SINGLE_DUMMY_USERS = [
         to: 2002,
       },
     ],
+    userType: "teacher",
   },
 ];
 
@@ -82,6 +83,7 @@ let DUMMY_USERS_LIST = [
         to: 2004,
       },
     ],
+    userType: "employer",
   },
 
   {
@@ -109,6 +111,7 @@ let DUMMY_USERS_LIST = [
         to: 2012,
       },
     ],
+    userType: "teacher",
   },
   {
     id: "u3",
@@ -146,6 +149,7 @@ let DUMMY_USERS_LIST = [
         to: 2004,
       },
     ],
+    userType: "teacher",
   },
   {
     id: "u4",
@@ -183,6 +187,7 @@ let DUMMY_USERS_LIST = [
         to: 2004,
       },
     ],
+    userType: "teacher",
   },
 ];
 
