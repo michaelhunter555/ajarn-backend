@@ -3,7 +3,7 @@ const router = express.Router();
 const jobsController = require("../controllers/jobs-controllers");
 const { check } = require("express-validator");
 
-let {
+const {
   thaiCities,
   fullTimeSalaries,
   partTimeSalaries,

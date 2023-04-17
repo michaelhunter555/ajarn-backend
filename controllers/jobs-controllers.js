@@ -113,6 +113,12 @@ const updateJobById = (req, res, next) => {
 const deleteJobById = (req, res, next) => {
   //request params for /:jid
   const jobId = req.params.jid;
+
+  //if we can't find a place for this id.
+  if (!dummy_jobs.find((j) => j.id === jobId)) {
+    throw new HttpError("Could not find a place for that id", 404);
+  }
+
   // simple filter function
   dummy_jobs = dummy_jobs.filter((job) => job.id !== jobId);
   res.status(200).json({ message: "deleted a job" });

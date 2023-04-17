@@ -17,7 +17,7 @@ router.post(
   "/sign-up",
   [
     check("name").not().isEmpty(),
-    check("email").isEmail(),
+    check("email").normalizeEmail().isEmail(),
     //password must be at least 7 characters and contain a number
     check("password").isLength({ min: 7 }).matches(/\d/),
   ],
