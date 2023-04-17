@@ -3,11 +3,12 @@ let dummy_jobs = require("../dummy_data/dummy_jobs");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 
+//GET all Jobs
 const getAllJobs = (req, res, next) => {
   res.json({ jobs: dummy_jobs });
 };
 
-//get job by id => /api/jobs/${job.id}
+//GET job by id => /api/jobs/${job.id}
 const getJobById = (req, res, next) => {
   const jobId = req.params.jid;
   const job = dummy_jobs.find((j) => {
@@ -20,7 +21,7 @@ const getJobById = (req, res, next) => {
   res.json({ job });
 };
 
-//get job by id => /api/jobs/${user.id}
+//GET job by user id => /api/jobs/${user.id}
 const getJobsByUserId = (req, res, next) => {
   const userId = req.params.uid;
   const jobs = dummy_jobs.filter((j) => {
@@ -42,7 +43,7 @@ const createJob = (req, res, next) => {
 
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new Error("invalid inputs passed, please check your data.");
+    throw new HttpError("invalid inputs passed, please check your data.", 422);
   }
 
   //list of expected fields for every job post
@@ -80,21 +81,17 @@ const createJob = (req, res, next) => {
   res.status(201).json({ job: createdJob });
 };
 
-//update job by Id
+//PATCH update job by Id
 const updateJobById = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new HttpError("invalid inputs passed, please check your data.", 422);
+  }
   const jobId = req.params.jid;
   //properties that the user can update from our user object.
-  const {
-    title,
-    location,
-    salary,
-    requirements,
-    description,
-    hours,
-    workPermit,
-    jobType,
-    creator,
-  } = req.body;
+  const { title, description, jobType } = req.body;
 
   //don't manipulate original array - create shallow copy.
   const updatedJob = { ...dummy_jobs.find((j) => j.id === jobId) };
@@ -104,21 +101,15 @@ const updateJobById = (req, res, next) => {
 
   //new field data
   updatedJob.title = title;
-  updatedJob.location = location;
-  updatedJob.salary = salary;
-  updatedJob.requirements = requirements;
   updatedJob.description = description;
-  updatedJob.hours = hours;
-  updatedJob.workPermit = workPermit;
   updatedJob.jobType = jobType;
-  updatedJob.creator = creator;
 
   //the job at said index will be the updated job (which we find by id).
   dummy_jobs[jobIndex] = updatedJob;
   res.status(200).json({ job: updatedJob });
 };
 
-//delete job by Id
+//DELETE delete job by Id
 const deleteJobById = (req, res, next) => {
   //request params for /:jid
   const jobId = req.params.jid;
@@ -126,6 +117,7 @@ const deleteJobById = (req, res, next) => {
   dummy_jobs = dummy_jobs.filter((job) => job.id !== jobId);
   res.status(200).json({ message: "deleted a job" });
 };
+
 exports.getAllJobs = getAllJobs;
 exports.getJobById = getJobById;
 exports.getJobsByUserId = getJobsByUserId;

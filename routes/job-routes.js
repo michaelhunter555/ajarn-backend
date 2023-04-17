@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jobsController = require("../controllers/jobs-controllers");
 const { check } = require("express-validator");
+
 let {
   thaiCities,
   fullTimeSalaries,
@@ -21,6 +22,8 @@ router.get("/user/:uid", jobsController.getJobsByUserId);
 //POST job
 router.post(
   "/",
+  //job validation logic
+  //salary, location, and requirement inputs must match pre-set Data lists in ../dummy_data/thaiCities
   [
     check("title").not().isEmpty(),
     check("description").isLength({ min: 7 }),
@@ -31,23 +34,17 @@ router.post(
     check("requirements").custom((value) => {
       return coreJobRequirements.includes(value);
     }),
-    check("workPermit")
-      .custom((value) => {
-        const allowedValue = [true, false];
-        return allowedValue.includes(value);
-      })
-      .withMessage("Please select if you provide a work-permit or not."),
-    check("location")
-      .custom((value) => {
-        return thaiCities.includes(value);
-      })
-      .withMessage("Please select a location valid location."),
-    check("hours")
-      .custom((value) => {
-        const allowedHours = ["Full-time", "Part-time"];
-        return allowedHours.includes(value);
-      })
-      .withMessage("Please select if the job is full-time or part-time"),
+    check("workPermit").custom((value) => {
+      const allowedValue = [true, false];
+      return allowedValue.includes(value);
+    }),
+    check("location").custom((value) => {
+      return thaiCities.includes(value);
+    }),
+    check("hours").custom((value) => {
+      const allowedHours = ["Full-time", "Part-time"];
+      return allowedHours.includes(value);
+    }),
     check("jobType").custom((value) => {
       const allowedJobType = ["basic", "featured", "flare"];
       return allowedJobType.includes(value);
@@ -57,7 +54,18 @@ router.post(
 );
 
 //update jobById
-router.patch("/:jid", jobsController.updateJobById);
+router.patch(
+  "/:jid",
+  [
+    check("title").not().isEmpty(),
+    check("description").isLength({ min: 7 }),
+    check("jobType").custom((value) => {
+      const allowedJobType = ["basic", "featured", "flare"];
+      return allowedJobType.includes(value);
+    }),
+  ],
+  jobsController.updateJobById
+);
 
 //delete jobById
 router.delete("/:jid", jobsController.deleteJobById);
