@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
 let dummy_jobs = require("../dummy_data/dummy_jobs");
+let { DUMMY_USERS_LIST } = require("../dummy_data/dummy_users");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 
@@ -121,6 +122,15 @@ const deleteJobById = (req, res, next) => {
 
   // simple filter function
   dummy_jobs = dummy_jobs.filter((job) => job.id !== jobId);
+
+  //remove application fom each user that applied
+  DUMMY_USERS_LIST.forEach((user) => {
+    if (user.applications) {
+      user.applications = user.applications.filter(
+        (resume) => resume.jobId !== jobId
+      );
+    }
+  });
   res.status(200).json({ message: "deleted a job" });
 };
 

@@ -148,19 +148,20 @@ const applyToJobById = (req, res, next) => {
       })
     : [];
 
-  //submit resume with unique id and the current date/time.
-  const submitResume = {
-    resumeId: uuidv4(),
-    applicationDate: new Date().toISOString(),
-    coverLetter,
-    resume: resumeItems,
-  };
-
   //find the user who is applying for the job by id.
   const user = DUMMY_USERS_LIST.find((user) => user.id === userId);
 
   //find the job the user is applying for by id.
   const job = dummy_jobs.find((job) => job.id === jobId);
+
+  //submit resume with unique id and the current date/time.
+  const submitResume = {
+    resumeId: uuidv4(),
+    applicationDate: new Date().toISOString(),
+    name: user.name,
+    coverLetter,
+    resume: resumeItems,
+  };
 
   //if not the correct user, throw an error
   if (!user) {
@@ -186,7 +187,7 @@ const applyToJobById = (req, res, next) => {
       user.applications = [];
     }
     //push the resumeId as a reference to the job they applied for.
-    user.applications.push(submitResume.resumeId);
+    user.applications.push({ id: submitResume.resumeId, jobId: jobId });
   }
   //upon succesful submission, render success message.
   res.status(200).json({ message: "Application submitted" });
