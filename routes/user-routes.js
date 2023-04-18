@@ -31,4 +31,17 @@ router.post(
   usersController.login
 );
 
+//POST applyToJob
+router.post(
+  "/:uid/apply/:jid",
+  [
+    check("userType").custom((val) => {
+      return val === "teacher";
+    }),
+    check("resume").not().isEmpty(),
+    check("coverLetter").not().isEmpty(),
+  ],
+  usersController.applyToJobById
+);
+
 module.exports = router;

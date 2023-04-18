@@ -1,5 +1,6 @@
 const HttpError = require("../models/http-error");
 let { DUMMY_USERS_LIST } = require("../dummy_data/dummy_users");
+let dummy_jobs = require("../dummy_data/dummy_jobs");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 
@@ -112,6 +113,86 @@ const addCredits = (req, res, next) => {
   res.status(200).json({ message: `added: ${credits} credits` });
 };
 
+//POST apply to jobs
+const applyToJobById = (req, res, next) => {
+  //validate data
+  const errors = validationResult(req);
+  //if there are any errors throw an error
+  if (!errors.isEmpty()) {
+    throw new HttpError("There was an error with your application", 500);
+  }
+  //request parameters for dynamic ids
+  const userId = req.params.uid;
+  const jobId = req.params.jid;
+
+  //destructure request.body
+  const { userType, resume, coverLetter } = req.body;
+
+  //only teachers can apply to jobs
+  if (userType !== "teacher") {
+    throw new HttpError("You must be a teacher to apply to jobs.");
+  }
+
+  //Check if the resume property is an array. If so, map over and return resume object. If not, return empty array.
+  const resumeItems = Array.isArray(resume)
+    ? resume.map((workHistory) => {
+        return {
+          company: workHistory.company,
+          schoolName: workHistory.schoolName,
+          role: workHistory.role,
+          location: workHistory.location,
+          jobTitle: workHistory.jobTitle,
+          from: workHistory.from,
+          to: workHistory.to,
+        };
+      })
+    : [];
+
+  //submit resume with unique id and the current date/time.
+  const submitResume = {
+    resumeId: uuidv4(),
+    applicationDate: new Date().toISOString(),
+    coverLetter,
+    resume: resumeItems,
+  };
+
+  //find the user who is applying for the job by id.
+  const user = DUMMY_USERS_LIST.find((user) => user.id === userId);
+
+  //find the job the user is applying for by id.
+  const job = dummy_jobs.find((job) => job.id === jobId);
+
+  //if not the correct user, throw an error
+  if (!user) {
+    throw new HttpError("User not found", 404);
+  }
+
+  //if not the correct job, throw an error.
+  if (!job) {
+    throw new HttpError("Job not found", 404);
+  }
+
+  //if job.applicants property does not already exist, create one and set to empty arrray;
+  if (!job.applicants) {
+    job.applicants = [];
+  }
+
+  //push the resume to applicants array in job object;
+  job.applicants.push(submitResume);
+
+  //if the user is a teacher and they don't have an applications property, create one. Set to empty array.
+  if (userType === "teacher") {
+    if (!user.applications) {
+      user.applications = [];
+    }
+    //push the resumeId as a reference to the job they applied for.
+    user.applications.push(submitResume.resumeId);
+  }
+  //upon succesful submission, render success message.
+  res.status(200).json({ message: "Application submitted" });
+};
+
+exports.applyToJobById = applyToJobById;
 exports.getUsers = getUsers;
 exports.getUserById = getUserById;
 exports.signup = signup;

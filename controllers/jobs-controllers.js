@@ -104,7 +104,7 @@ const updateJobById = (req, res, next) => {
   updatedJob.description = description;
   updatedJob.jobType = jobType;
 
-  //the job at said index will be the updated job (which we find by id).
+  //the job at said index will be the updated job (which we find by its index).
   dummy_jobs[jobIndex] = updatedJob;
   res.status(200).json({ job: updatedJob });
 };
