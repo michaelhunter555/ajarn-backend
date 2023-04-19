@@ -124,13 +124,13 @@ const deleteJobById = (req, res, next) => {
   dummy_jobs = dummy_jobs.filter((job) => job.id !== jobId);
 
   //remove application fom each user that applied
-  DUMMY_USERS_LIST.forEach((user) => {
-    if (user.applications) {
-      user.applications = user.applications.filter(
-        (resume) => resume.jobId !== jobId
-      );
-    }
-  });
+  // DUMMY_USERS_LIST.forEach((user) => {
+  //   if (user.applications) {
+  //     user.applications = user.applications.filter(
+  //       (resume) => resume.jobId !== jobId
+  //     );
+  //   }
+  // });
   res.status(200).json({ message: "deleted a job" });
 };
 

@@ -85,6 +85,7 @@ let DUMMY_USERS_LIST = [
     ],
     userType: "employer",
     applications: [],
+    isHidden: false,
   },
 
   {
@@ -114,6 +115,7 @@ let DUMMY_USERS_LIST = [
     ],
     userType: "teacher",
     applications: [],
+    isHidden: false,
   },
   {
     id: "u3",
@@ -153,6 +155,7 @@ let DUMMY_USERS_LIST = [
     ],
     userType: "teacher",
     applications: [],
+    isHidden: false,
   },
   {
     id: "u4",
@@ -192,6 +195,7 @@ let DUMMY_USERS_LIST = [
     ],
     userType: "teacher",
     applications: [],
+    isHidden: false,
   },
 ];
 
