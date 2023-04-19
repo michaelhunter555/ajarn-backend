@@ -85,7 +85,7 @@ let DUMMY_USERS_LIST = [
     ],
     userType: "employer",
     applications: [],
-    isHidden: false,
+    isHidden: true,
   },
 
   {

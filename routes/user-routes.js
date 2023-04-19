@@ -6,6 +6,9 @@ const { check } = require("express-validator");
 //GET all users
 router.get("/", usersController.getUsers);
 
+//Get all visible users
+router.get("/visible-users", usersController.getVisibleUsers);
+
 //GET find user by id
 router.get("/:uid", usersController.getUserById);
 
@@ -30,6 +33,9 @@ router.post(
   [check("email").isEmail(), check("password").not().isEmpty()],
   usersController.login
 );
+
+//POST update visiblity
+router.post("/update-visiblity/:uid", usersController.updateVisiblity);
 
 //POST applyToJob
 router.post(

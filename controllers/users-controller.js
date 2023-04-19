@@ -9,6 +9,30 @@ const getUsers = (req, res, next) => {
   res.json({ users: DUMMY_USERS_LIST });
 };
 
+//GET all users who consent to have their profile viewed.
+const getVisibleUsers = (req, res, next) => {
+  const visibleUsers = DUMMY_USERS_LIST.filter((user) => !user.isHidden);
+  res.json({ users: visibleUsers });
+};
+
+//POST update user visibility in results page
+const updateVisiblity = (req, res, next) => {
+  const userId = req.params.uid;
+
+  const { isHidden } = req.body;
+
+  const user = DUMMY_USERS_LIST.find((user) => user.id === userId);
+
+  if (!user) {
+    throw new HttpError(
+      "error with updating this user id. Please contact us for assistance.",
+      400
+    );
+  }
+  user.isHidden = isHidden;
+  res.status(200).json({ user: user });
+};
+
 //GET userById
 const getUserById = (req, res, next) => {
   //get user by dynamic id we set in routes /:uid
@@ -145,7 +169,7 @@ const applyToJobById = (req, res, next) => {
   const job = dummy_jobs.find((job) => job.id === jobId);
 
   //30 day math calculation from date application is submitted to date (30 days)
-  let now = new Date();
+  const now = new Date();
   //30 days * 24 hours in a day * 60 minutes in an hours * 60 seconds in a minute * 1000 = 30 days in milliseconds
   const thirtyDays = 30 * 24 * 60 * 60 * 1000;
   //check for any prior association with current job id within the last 30 days
@@ -164,7 +188,10 @@ const applyToJobById = (req, res, next) => {
 
   //if true, throw an error because user has applied already.
   if (userAppliedAlready) {
-    throw new HttpError(`'You may only apply to a job once every 30 days'`);
+    throw new HttpError(
+      `'You may only apply to a job once every 30 days'`,
+      500
+    );
   }
 
   //submit resume with unique id and the current date/time.
@@ -210,8 +237,8 @@ const applyToJobById = (req, res, next) => {
   res.status(200).json({ message: "Application submitted" });
 };
 
-const userIsVisible = (req, res, next) => {};
-
+exports.updateVisiblity = updateVisiblity;
+exports.getVisibleUsers = getVisibleUsers;
 exports.applyToJobById = applyToJobById;
 exports.getUsers = getUsers;
 exports.getUserById = getUserById;
