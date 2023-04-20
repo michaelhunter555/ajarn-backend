@@ -50,6 +50,7 @@ let DUMMY_USERS_LIST = [
   {
     id: "u1",
     name: "John Doe",
+    email: "therealjohndo@google.com",
     image: "John",
     credits: 0,
     location: "Phuket",
@@ -91,6 +92,7 @@ let DUMMY_USERS_LIST = [
   {
     id: "u2",
     name: "Michael Hunter",
+    email: "therealmike@google.com",
     image: "MichaelHunter",
     credits: 0,
     location: "Bangkok",
@@ -121,6 +123,7 @@ let DUMMY_USERS_LIST = [
     id: "u3",
     name: "Bob McFarland",
     image: "Bob",
+    email: "therealbob@google.com",
     credits: 1,
     location: "Bangkok",
     nationality: "Swiss",
@@ -161,6 +164,7 @@ let DUMMY_USERS_LIST = [
     id: "u4",
     name: "Janitha Willdubs",
     image: "Janitha",
+    email: "therealjanitha@google.com",
     credits: 0,
     location: "Chiang Mai",
     nationality: "English",

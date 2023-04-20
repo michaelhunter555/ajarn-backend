@@ -36,9 +36,9 @@ const updateVisiblity = (req, res, next) => {
 //GET userById
 const getUserById = (req, res, next) => {
   //get user by dynamic id we set in routes /:uid
-  let userId = req.params.uid;
+  const userId = req.params.uid;
   //match the user id in our object with the user id in request
-  let user = DUMMY_USERS_LIST.find((u) => u.id === userId);
+  const user = DUMMY_USERS_LIST.find((u) => u.id === userId);
 
   //no match, throw an error
   if (!user) {
@@ -106,6 +106,63 @@ const login = (req, res, next) => {
 
   //return successful login message
   res.status(200).json({ message: "logged in" });
+};
+
+//PATCH update userProfile
+const updateUserProfile = (req, res, next) => {
+  //make sure all user inputs satisfy requirements (i.e. email is in email format)
+  const errors = validationResult(req);
+
+  //if any errors, throw an error, log the errors as well.
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    throw new HttpError("Please make sure all updated fields are valid", 422);
+  }
+
+  //req user id
+  const userId = req.params.uid;
+
+  //what the user can update
+  const {
+    name,
+    email,
+    location,
+    nationality,
+    education,
+    workExperience,
+    interests,
+    highestCertification,
+    about,
+    skill,
+    resume,
+    userType,
+  } = req.body;
+
+  //don't want to directly manipulate user object, so create a shallow copy.
+  const updatedUser = {
+    ...DUMMY_USERS_LIST.find((user) => user.id === userId),
+  };
+
+  //the index where this user exists
+  const userIndex = DUMMY_USERS_LIST.findIndex((user) => user.id === userId);
+
+  //newly updated properties as follows
+  updatedUser.name = name;
+  updatedUser.email = email;
+  updatedUser.location = location;
+  updatedUser.nationality = nationality;
+  updatedUser.education = education;
+  updatedUser.workExperience = workExperience;
+  updatedUser.interests = interests;
+  updatedUser.highestCertification = highestCertification;
+  updatedUser.about = about;
+  updatedUser.skill = skill;
+  updatedUser.resume = resume;
+  updatedUser.userType = userType;
+
+  //user index to be updated
+  DUMMY_USERS_LIST[userIndex] = updatedUser;
+  res.status(200).json({ user: updatedUser });
 };
 
 //PATCH add credits to user
@@ -237,6 +294,7 @@ const applyToJobById = (req, res, next) => {
   res.status(200).json({ message: "Application submitted" });
 };
 
+exports.updateUserProfile = updateUserProfile;
 exports.updateVisiblity = updateVisiblity;
 exports.getVisibleUsers = getVisibleUsers;
 exports.applyToJobById = applyToJobById;

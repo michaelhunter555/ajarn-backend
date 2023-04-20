@@ -2,18 +2,42 @@ const express = require("express");
 const router = express.Router();
 const usersController = require("../controllers/users-controller");
 const { check } = require("express-validator");
+const { thaiCities } = require("../dummy_data/ThaiData");
+
+/* GET ROUTES */
 
 //GET all users
 router.get("/", usersController.getUsers);
 
-//Get all visible users
+//GET all visible users
 router.get("/visible-users", usersController.getVisibleUsers);
 
 //GET find user by id
 router.get("/:uid", usersController.getUserById);
 
+/* PATCH ROUTES */
+
 //PATCH add credits
 router.patch("/:uid/add-credits", usersController.addCredits);
+
+//PATCH update Profile
+router.patch(
+  "/update-profile/:uid",
+  [
+    check("name").not().isEmpty(),
+    check("email").normalizeEmail().isEmail(),
+    check("location").custom((val) => {
+      return thaiCities.includes(val);
+    }),
+    check("userType").custom((val) => {
+      const allowedUserType = ["teacher", "employer"];
+      return allowedUserType.includes(val);
+    }),
+  ],
+  usersController.updateUserProfile
+);
+
+/* POST ROUTES */
 
 //POST sign-up post
 router.post(
@@ -34,7 +58,7 @@ router.post(
   usersController.login
 );
 
-//POST update visiblity
+//POST update profile visiblity
 router.post("/update-visiblity/:uid", usersController.updateVisiblity);
 
 //POST applyToJob
