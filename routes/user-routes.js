@@ -1,24 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const usersController = require("../controllers/users-controller");
+const getUsers = require("../controllers/users/get-users");
+const getVisibleUsers = require("../controllers/users/get-visible-users");
+const updateVisibility = require("../controllers/users/update-visibility");
+const getUserById = require("../controllers/users/get-user-by-id");
+const signup = require("../controllers/users/sign-up");
+const login = require("../controllers/users/login");
+const updateUserProfile = require("../controllers/users/update-user-profile");
+const addCredits = require("../controllers/users/add-credits");
+const applyToJobById = require("../controllers/users/apply-to-job");
 const { check } = require("express-validator");
 const { thaiCities } = require("../dummy_data/ThaiData");
 
 /* GET ROUTES */
 
 //GET all users
-router.get("/", usersController.getUsers);
+router.get("/", getUsers);
 
 //GET all visible users
-router.get("/visible-users", usersController.getVisibleUsers);
+router.get("/visible-users", getVisibleUsers);
 
 //GET find user by id
-router.get("/:uid", usersController.getUserById);
+router.get("/:uid", getUserById);
 
 /* PATCH ROUTES */
 
 //PATCH add credits
-router.patch("/:uid/add-credits", usersController.addCredits);
+router.patch("/:uid/add-credits", addCredits);
 
 //PATCH update Profile
 router.patch(
@@ -29,7 +37,7 @@ router.patch(
       return allowedUserType.includes(val);
     }),
   ],
-  usersController.updateUserProfile
+  updateUserProfile
 );
 
 /* POST ROUTES */
@@ -43,18 +51,18 @@ router.post(
     //password must be at least 7 characters and contain a number
     check("password").isLength({ min: 7 }).matches(/\d/),
   ],
-  usersController.signup
+  signup
 );
 
 //POST login
 router.post(
   "/login",
   [check("email").isEmail(), check("password").not().isEmpty()],
-  usersController.login
+  login
 );
 
-//POST update profile visiblity
-router.post("/update-visiblity/:uid", usersController.updateVisiblity);
+//PATCH update profile visiblity
+router.patch("/update-visibility/:uid", updateVisibility);
 
 //POST applyToJob
 router.post(
@@ -66,7 +74,7 @@ router.post(
     check("resume").not().isEmpty(),
     check("coverLetter").not().isEmpty(),
   ],
-  usersController.applyToJobById
+  applyToJobById
 );
 
 module.exports = router;
