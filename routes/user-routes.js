@@ -24,11 +24,6 @@ router.patch("/:uid/add-credits", usersController.addCredits);
 router.patch(
   "/update-profile/:uid",
   [
-    check("name").not().isEmpty(),
-    check("email").normalizeEmail().isEmail(),
-    check("location").custom((val) => {
-      return thaiCities.includes(val);
-    }),
     check("userType").custom((val) => {
       const allowedUserType = ["teacher", "employer"];
       return allowedUserType.includes(val);

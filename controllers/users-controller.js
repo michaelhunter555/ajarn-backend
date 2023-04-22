@@ -3,10 +3,20 @@ let { DUMMY_USERS_LIST } = require("../dummy_data/dummy_users");
 let dummy_jobs = require("../dummy_data/dummy_jobs");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
+const User = require("../models/users");
 
 //GET all users
-const getUsers = (req, res, next) => {
-  res.json({ users: DUMMY_USERS_LIST });
+const getUsers = async (req, res, next) => {
+  //
+  let user;
+  //
+  try {
+    user = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError("there was an error finding the user", 500);
+    return next(error);
+  }
+  res.json({ users: user.map((user) => user.toObject({ getters: true })) });
 };
 
 //GET all users who consent to have their profile viewed.
@@ -34,16 +44,26 @@ const updateVisiblity = (req, res, next) => {
 };
 
 //GET userById
-const getUserById = (req, res, next) => {
+const getUserById = async (req, res, next) => {
   //get user by dynamic id we set in routes /:uid
   const userId = req.params.uid;
-  //match the user id in our object with the user id in request
-  const user = DUMMY_USERS_LIST.find((u) => u.id === userId);
 
-  //no match, throw an error
+  //declare user variable
+  let user;
+
+  //try to find user
+  try {
+    user = await User.findById(userId);
+  } catch (err) {
+    //if issues with our call, return next error
+    const error = new HttpError("There was an issue with the request", 500);
+    return next(error);
+  }
+
+  //no match for userId, throw an error
   if (!user) {
     const error = new HttpError("Could not find user by this id.", 404);
-    throw error;
+    return next(error);
   }
 
   //json object of user data
@@ -51,7 +71,7 @@ const getUserById = (req, res, next) => {
 };
 
 //POST user sign-up
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
   //make sure user inputs satisfy requirments
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -65,16 +85,35 @@ const signup = (req, res, next) => {
   const { name, email, password } = req.body;
 
   //check if e-mail already exists
-  const hasUser = DUMMY_USERS_LIST.find((u) => u.email === email);
-  if (hasUser) {
-    throw new Error("A user already exists under the current e-mail.");
+  let hasUser;
+  //try email
+  try {
+    hasUser = await User.findOne({ email: email });
+  } catch (err) {
+    //if issue with call, return next error
+    const error = new HttpError("Signing up failed, please try again", 500);
+    return next(error);
   }
 
-  //for now pass the data in a object with unique id.
-  const createdUser = { id: uuidv4(), name, email, password };
+  //if user does already exist, return next error
+  if (hasUser) {
+    const error = new Error(
+      "A user already exists under the current e-mail.",
+      404
+    );
+    return next(error);
+  }
 
-  //push that data to our list of objects
-  DUMMY_USERS_LIST.push(createdUser);
+  //create new instance of User object with required fields
+  const createdUser = new User({ name, email, password });
+  //try to create user
+  try {
+    await createdUser.save();
+  } catch (err) {
+    //if issue with call, return next error
+    const error = new HttpError("signing up failed, please try again", 500);
+    return next(error);
+  }
 
   //render json data of new user
   res.status(201).json({ user: createdUser });
@@ -109,7 +148,7 @@ const login = (req, res, next) => {
 };
 
 //PATCH update userProfile
-const updateUserProfile = (req, res, next) => {
+const updateUserProfile = async (req, res, next) => {
   //make sure all user inputs satisfy requirements (i.e. email is in email format)
   const errors = validationResult(req);
 
@@ -122,46 +161,51 @@ const updateUserProfile = (req, res, next) => {
   //req user id
   const userId = req.params.uid;
 
-  //what the user can update
-  const {
-    name,
-    email,
-    location,
-    nationality,
-    education,
-    workExperience,
-    interests,
-    highestCertification,
-    about,
-    skill,
-    resume,
-    userType,
-  } = req.body;
+  //get existing fields
+  const updatedFields = {};
 
-  //don't want to directly manipulate user object, so create a shallow copy.
-  const updatedUser = {
-    ...DUMMY_USERS_LIST.find((user) => user.id === userId),
-  };
+  //create list of existing fields
+  const findExistingFields = [
+    "name",
+    "email",
+    "location",
+    "nationality",
+    "education",
+    "workExperience",
+    "interests",
+    "highestCertification",
+    "about",
+    "skill",
+    "resume",
+    "userType",
+  ];
 
-  //the index where this user exists
-  const userIndex = DUMMY_USERS_LIST.findIndex((user) => user.id === userId);
+  //loop over the fields and see if the field is empty or not.
+  //if it's not empty, add it to existing data to the req.body
+  for (const key of findExistingFields) {
+    if (req.body[key] !== undefined) {
+      updatedFields[key] = req.body[key];
+    }
+  }
 
-  //newly updated properties as follows
-  updatedUser.name = name;
-  updatedUser.email = email;
-  updatedUser.location = location;
-  updatedUser.nationality = nationality;
-  updatedUser.education = education;
-  updatedUser.workExperience = workExperience;
-  updatedUser.interests = interests;
-  updatedUser.highestCertification = highestCertification;
-  updatedUser.about = about;
-  updatedUser.skill = skill;
-  updatedUser.resume = resume;
-  updatedUser.userType = userType;
+  //declare update user variable
+  let updatedUser;
 
-  //user index to be updated
-  DUMMY_USERS_LIST[userIndex] = updatedUser;
+  //try to find user by id and update
+  try {
+    //find our user, updatable fields and set new to true to ensure a new an updated document in the response.
+    updatedUser = await User.findByIdAndUpdate(userId, updatedFields, {
+      new: true,
+    });
+  } catch (err) {
+    //any issues with our request, return next error
+    const error = new HttpError(
+      "There was an issue trying to send a request for updating the user",
+      500
+    );
+    return next(error);
+  }
+  //return updated user as json object
   res.status(200).json({ user: updatedUser });
 };
 

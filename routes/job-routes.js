@@ -13,15 +13,15 @@ const {
 //Get all jobs
 router.get("/", jobsController.getAllJobs);
 
-//GET jobs by jobId
-router.get("/:jid", jobsController.getJobById);
-
 //GET job by userId
 router.get("/user/:uid", jobsController.getJobsByUserId);
 
+//GET jobs by jobId
+router.get("/:jid", jobsController.getJobById);
+
 //POST job
 router.post(
-  "/",
+  "/user/:uid/job",
   //job validation logic
   //salary, location, and requirement inputs must match pre-set Data lists in ../dummy_data/thaiCities
   [
