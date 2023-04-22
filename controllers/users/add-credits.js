@@ -9,12 +9,14 @@ const addCredits = async (req, res, next) => {
   // Get credits from request body
   const { credits } = req.body;
 
+  //declare user variable
   let user;
 
+  //find user by id
   try {
     user = await User.findById(userId);
-    //{ ...DUMMY_USERS_LIST.find((u) => u.id === userId) };
   } catch (err) {
+    //if our request is bad, return next error
     const error = new HttpError(
       "there was an issue with adding credits to this user",
       500

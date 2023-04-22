@@ -23,6 +23,7 @@ const applyToJobById = async (req, res, next) => {
   //destructure request.body
   const { userType, coverLetter } = req.body;
 
+  //declare user and job variables
   let user;
   let job;
 

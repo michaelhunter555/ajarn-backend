@@ -58,6 +58,7 @@ const updateUserProfile = async (req, res, next) => {
         return next(error);
       }
     } catch (err) {
+      //catch if bad request and return next error
       const error = new HttpError(
         "There was an issue with sending the request",
         500

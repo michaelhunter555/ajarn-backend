@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const jobsController = require("../controllers/jobs-controllers");
+const getAllJobs = require("../controllers/jobs/get-all-jobs");
+const getJobById = require("../controllers/jobs/get-job-by-id");
+const getJobsByUserId = require("../controllers/jobs/get-jobs-by-user-id");
+const createJob = require("../controllers/jobs/create-job");
+const updateJobById = require("../controllers/jobs/update-job");
+const deleteJobById = require("../controllers/jobs/delete-job-by-id");
+
 const { check } = require("express-validator");
 
 const {
@@ -11,13 +17,13 @@ const {
 } = require("../dummy_data/ThaiData");
 
 //Get all jobs
-router.get("/", jobsController.getAllJobs);
+router.get("/", getAllJobs);
 
 //GET job by userId
-router.get("/user/:uid", jobsController.getJobsByUserId);
+router.get("/user/:uid", getJobsByUserId);
 
 //GET jobs by jobId
-router.get("/:jid", jobsController.getJobById);
+router.get("/:jid", getJobById);
 
 //POST job
 router.post(
@@ -50,7 +56,7 @@ router.post(
       return allowedJobType.includes(value);
     }),
   ],
-  jobsController.createJob
+  createJob
 );
 
 //update jobById
@@ -64,10 +70,10 @@ router.patch(
       return allowedJobType.includes(value);
     }),
   ],
-  jobsController.updateJobById
+  updateJobById
 );
 
 //delete jobById
-router.delete("/:jid", jobsController.deleteJobById);
+router.delete("/:jid", deleteJobById);
 
 module.exports = router;

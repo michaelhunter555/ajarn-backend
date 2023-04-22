@@ -3,40 +3,48 @@ const User = require("../../models/users");
 
 //POST update user visibility in results page
 const updateVisibility = async (req, res, next) => {
+  //request userId params
   const userId = req.params.uid;
 
+  //access isHidden property through destructuring
   const { isHidden } = req.body;
 
+  //declare user variable
   let user;
 
+  //look for that user by id
   try {
     user = await User.findById(userId);
   } catch (err) {
+    //throw an error if our request is bad
     const error = new HttpError(
       "there was an issue the request to change visibility",
       500
     );
     return next(error);
   }
-
+  //if not the correct user, return next error
   if (!user) {
-    throw new HttpError(
+    const error = new HttpError(
       "error with updating this user id. Please contact us for assistance.",
       400
     );
+    next(error);
   }
+  //set isHidden property to new boolean value
   user.isHidden = isHidden;
-
+  //update isHidden property
   try {
     await User.updateOne({ _id: userId }, { $set: { isHidden: isHidden } });
   } catch (err) {
-    console.log(err);
+    //if our request is bad, return next error
     const error = new HttpError(
       "there was an issue trying to save the changed visibility setting",
       500
     );
     return next(error);
   }
+  //return user with isHidden property updated.
   res.status(200).json({ user: user });
 };
 
