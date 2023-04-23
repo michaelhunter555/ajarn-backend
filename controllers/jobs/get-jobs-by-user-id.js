@@ -26,7 +26,7 @@ const getJobsByUserId = async (req, res, next) => {
     return next(error);
   }
   //sent the jobs array as a json response
-  res.json({ Jobs: jobs.toObject({ getters: true }) });
+  res.json({ jobs: jobs.toObject({ getters: true }) });
 };
 
 module.exports = getJobsByUserId;

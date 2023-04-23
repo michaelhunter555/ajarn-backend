@@ -25,7 +25,7 @@ const getUserById = async (req, res, next) => {
   }
 
   //json object of user data
-  res.json({ user });
+  res.json({ user: user.toObject({ getters: true }) });
 };
 
 module.exports = getUserById;

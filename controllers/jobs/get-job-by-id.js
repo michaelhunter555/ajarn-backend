@@ -9,15 +9,25 @@ const getJobById = async (req, res, next) => {
   //declare job variable
   let job;
 
-  //try finding job by Id with await and try catch
+  //try finding job by Id
   try {
-    //await job FindById
-    job = await Job.findById(jobId).populate("creator");
+    //await job FindById and populate fields we'll need in our request.
+    job = await Job.findById(jobId)
+      .populate("creator")
+      .populate({
+        path: "applicants",
+        model: "Application",
+        populate: {
+          path: "userId",
+          model: "Users",
+          select: "name email resume",
+        },
+      });
   } catch (err) {
     console.log(err);
-    //create HttpError and store in variable
+    // if error with request, return next error
     const error = new HttpError(
-      "There was an error retriving the provided job id.",
+      "There was an error retriving the provided job by id.",
       500
     );
     //return error if there are general problems with our GET request

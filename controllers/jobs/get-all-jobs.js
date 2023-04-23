@@ -7,7 +7,7 @@ const getAllJobs = async (req, res, next) => {
   let jobs;
   //find all job objects
   try {
-    jobs = await Job.find({});
+    jobs = await Job.find({}).populate("creator");
   } catch (err) {
     //if our request is bad return next error
     const error = new HttpError(
