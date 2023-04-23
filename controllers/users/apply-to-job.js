@@ -1,6 +1,8 @@
+const mongoose = require("mongoose");
 const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
 const Job = require("../../models/jobs");
+const Application = require("../../models/application");
 const { validationResult } = require("express-validator");
 
 //POST apply to jobs
@@ -21,25 +23,42 @@ const applyToJobById = async (req, res, next) => {
   const jobId = req.params.jid;
 
   //destructure request.body
-  const { userType, coverLetter } = req.body;
+  const { coverLetter, resume } = req.body;
 
   //declare user and job variables
   let user;
   let job;
-
+  //find our user by id and the job being applied to by id
   try {
-    user = await User.findByIdAndUpdate(userId);
-    job = await Job.findByIdAndUpdate(jobId);
+    user = await User.findById(userId);
+    job = await Job.findById(jobId);
   } catch (err) {
     const error = new HttpError(
       "There was an issue with the request to find the user"
     );
     return next(error);
   }
+  //if either the userId or jobId doesn't exist, return next error'
+  if (!user || !job) {
+    const error = new HttpError(
+      "Could not find user or job for the provided ids",
+      404
+    );
+    return next(error);
+  }
 
-  //only teachers can apply to jobs
+  //our Application Object takes userId, jobId, resume, coverLetter
+  const newApplication = new Application({
+    userId,
+    jobId,
+    resume: [resume],
+    coverLetter,
+  });
+
+  //only teachers can apply to jobs, employers cannot
   if (user.userType !== "teacher") {
-    throw new HttpError("You must be a teacher to apply to jobs.", 404);
+    const error = new HttpError("You must be a teacher to apply to jobs.", 404);
+    return next(error);
   }
 
   //30 day math calculation from date application is submitted to date (30 days)
@@ -62,22 +81,12 @@ const applyToJobById = async (req, res, next) => {
 
   //if true, throw an error because user has applied already.
   if (userAppliedAlready) {
-    throw new HttpError(
+    const error = new HttpError(
       `'You may only apply to a job once every 30 days'`,
-      500
+      404
     );
+    return next(error);
   }
-
-  //submit resume with unique id and the current date/time.
-  const submitResume = {
-    applicationDate: new Date().toISOString(),
-    name: user.name,
-    coverLetter,
-    resume: {
-      ...user.resume,
-      userId: user._id,
-    },
-  };
 
   //if not the correct user, throw an error
   if (!user) {
@@ -89,37 +98,30 @@ const applyToJobById = async (req, res, next) => {
     throw new HttpError("Job not found", 404);
   }
 
-  //if job.applicants property does not already exist, create one and set to empty arrray;
-  if (!job.applicants) {
-    job.applicants = [];
-  }
-
-  job.applicants.push(submitResume);
-  //push the resume to applicants array in job object;
+  //associate application by user and job
   try {
-    await job.save();
+    //state mongoose session
+    const sess = await mongoose.startSession();
+    //start transaction
+    sess.startTransaction();
+    //save new application data
+    await newApplication.save({ session: sess });
+    //push the application to user applications array
+    user.applications.push(newApplication);
+    //save the user
+    await user.save({ session: sess });
+    //push the id of the application to the job
+    job.applicants.push(newApplication._id);
+    //save the job
+    await job.save({ session: sess });
+    //commit transaction
+    await sess.commitTransaction();
   } catch (err) {
-    const error = new HttpError("There was error with the request", 500);
-    return next(error);
-  }
-
-  //if the user is a teacher and they don't have an applications property, create one. Set to empty array.
-  if (userType === "teacher") {
-    if (!user.applications) {
-      user.applications = [];
-    }
-
-    //push the resumeId as a reference to the job they applied for.
-    user.applications.push({
-      jobId: jobId,
-      applicationDate: new Date(),
-    });
-  }
-
-  try {
-    await user.save();
-  } catch (err) {
-    const error = new HttpError("There was error with the request", 500);
+    console.log(err);
+    const error = new HttpError(
+      "There was error with the request to apply to the job",
+      500
+    );
     return next(error);
   }
 

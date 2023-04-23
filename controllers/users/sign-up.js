@@ -31,13 +31,20 @@ const signup = async (req, res, next) => {
   if (hasUser) {
     const error = new Error(
       "A user already exists under the current e-mail.",
-      404
+      422
     );
     return next(error);
   }
 
   //create new instance of User object with required fields
-  const createdUser = new User({ name, email, password });
+  const createdUser = new User({
+    name,
+    email,
+    image:
+      "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+    password,
+  });
+
   //try to create user
   try {
     await createdUser.save();
@@ -48,7 +55,7 @@ const signup = async (req, res, next) => {
   }
 
   //render json data of new user
-  res.status(201).json({ user: createdUser });
+  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
 };
 
 module.exports = signup;

@@ -23,6 +23,7 @@ const updateUserProfile = async (req, res, next) => {
   const findExistingFields = [
     "name",
     "email",
+    "image",
     "location",
     "nationality",
     "education",
@@ -33,6 +34,7 @@ const updateUserProfile = async (req, res, next) => {
     "skill",
     "resume",
     "userType",
+    "isHidden",
   ];
 
   //loop over the fields and see if the field is empty or not.

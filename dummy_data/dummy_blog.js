@@ -27,3 +27,5 @@ let DUMMY_BLOG = [
       "Blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah.",
   },
 ];
+
+module.exports = DUMMY_BLOG;

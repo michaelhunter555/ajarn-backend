@@ -12,7 +12,7 @@ const getJobById = async (req, res, next) => {
   //try finding job by Id with await and try catch
   try {
     //await job FindById
-    job = await Job.findById(jobId);
+    job = await Job.findById(jobId).populate("creator");
   } catch (err) {
     console.log(err);
     //create HttpError and store in variable

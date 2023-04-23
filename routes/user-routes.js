@@ -67,13 +67,7 @@ router.patch("/update-visibility/:uid", updateVisibility);
 //POST applyToJob
 router.post(
   "/:uid/apply/:jid",
-  [
-    check("userType").custom((val) => {
-      return val === "teacher";
-    }),
-    check("resume").not().isEmpty(),
-    check("coverLetter").not().isEmpty(),
-  ],
+  [check("resume").not().isEmpty()],
   applyToJobById
 );
 

@@ -27,7 +27,7 @@ router.get("/:jid", getJobById);
 
 //POST job
 router.post(
-  "/user/:uid/job",
+  "/create-job/:uid",
   //job validation logic
   //salary, location, and requirement inputs must match pre-set Data lists in ../dummy_data/thaiCities
   [
