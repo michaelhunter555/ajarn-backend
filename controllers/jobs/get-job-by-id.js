@@ -12,6 +12,7 @@ const getJobById = async (req, res, next) => {
   //try finding job by Id
   try {
     //await job FindById and populate fields we'll need in our request.
+    /*add if check to see if user is creator, if not, remove populated fields */
     job = await Job.findById(jobId)
       .populate("creator")
       .populate({

@@ -7,12 +7,14 @@ const Creator = require("../../models/creator");
 
 //job POST
 const createJob = async (req, res, next) => {
+  //make sure user inputs are valid
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     console.log(errors);
     throw new HttpError("invalid inputs passed, please check your data.", 422);
   }
+  //get userId
   const userId = req.params.uid;
 
   //list of expected fields for every job post
@@ -28,10 +30,41 @@ const createJob = async (req, res, next) => {
     creatorData,
   } = req.body;
 
-  const creator = new Creator({
-    _id: userId,
-    ...creatorData,
-  });
+  //declare creator variable for Creator object
+  let creator;
+
+  try {
+    //find creator
+    creator = await Creator.findById(userId);
+    //declare shouldUpdate as false and only true if our creator data for this job is different
+    let shouldUpdate = false;
+    //if not the creator we create a new Creator object that user
+    if (!creator) {
+      creator = new Creator({
+        //Creator id will take userId as a reference
+        _id: userId,
+        //spread of create data
+        ...creatorData,
+      });
+    } else {
+      //get keys of creatorData object and check if the values are different.
+      //if they are, update the creator fields.
+      //set shoudUpdate to true if any fields are different
+      Object.keys(creatorData).forEach((key) => {
+        if (creatorData[key] !== creator[key]) {
+          creator[key] = creatorData[key];
+          shouldUpdate = true;
+        }
+      });
+      //if fields have been changed, save the fields.
+      if (shouldUpdate) {
+        await creator.save();
+      }
+    }
+  } catch (err) {
+    const error = new HttpError("Error with finding/creating creator", 500);
+    return next(error);
+  }
 
   //in the future for google maps note that location will need lat & lng key.
   const createdJob = new Job({
@@ -49,19 +82,24 @@ const createJob = async (req, res, next) => {
     creator: creator._id,
   });
 
+  //declare user variable
   let user;
+
   try {
+    //try to find user by id
     user = await User.findById(userId);
   } catch (err) {
     const error = new HttpError("Error with creating job request", 500);
     return next(error);
   }
 
+  //if user does not exist in our database, return next error.
   if (!user) {
     const error = new HttpError("User Id issue with creating job request", 404);
     return next(error);
   }
 
+  //if user has their userType property set to teacher, return next error.
   if (user.userType === "teacher") {
     const error = new HttpError(
       "Only employers can create jobs, please adjust your settings",
@@ -95,7 +133,7 @@ const createJob = async (req, res, next) => {
   }
 
   //res json createJob object
-  res.status(201).json({ job: createdJob });
+  res.status(201).json({ job: createdJob.toObject({ getters: true }) });
 };
 
 module.exports = createJob;
