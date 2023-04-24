@@ -1,6 +1,7 @@
 const HttpError = require("../../models/http-error");
 const Job = require("../../models/jobs");
 const mongoose = require("mongoose");
+const User = require("../../models/users");
 
 //DELETE delete job by Id
 const deleteJobById = async (req, res, next) => {
@@ -32,11 +33,10 @@ const deleteJobById = async (req, res, next) => {
     //delete job from database
     await job.deleteOne({ _id: jobId }, { session: sess });
     //remove job from user id jobs
-    if (job.creator.jobs) {
-      job.creator.jobs.pull({ _id: jobId });
-    }
+    const user = await User.findById(job.creator._id);
+    user.jobs.pull({ _id: jobId });
     //save the new user's changes
-    await job.creator.save({ session: sess });
+    await user.save({ session: sess });
     //commit transaction
     await sess.commitTransaction();
   } catch (err) {
