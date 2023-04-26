@@ -7,6 +7,7 @@ const getUsers = async (req, res, next) => {
   let user;
   // find all available users - remove password from result
   try {
+    //get all users excluding their password
     user = await User.find({}, "-password");
   } catch (err) {
     const error = new HttpError("there was an error finding the user", 500);

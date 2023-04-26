@@ -25,7 +25,7 @@ const getJobsByUserId = async (req, res, next) => {
     );
     return next(error);
   }
-  //sent the jobs array as a json response
+  //res jobs by userId
   res.json({ jobs: jobs.toObject({ getters: true }) });
 };
 

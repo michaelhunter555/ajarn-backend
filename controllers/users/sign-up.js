@@ -29,7 +29,7 @@ const signup = async (req, res, next) => {
 
   //if user does already exist, return next error
   if (hasUser) {
-    const error = new Error(
+    const error = new HttpError(
       "A user already exists under the current e-mail.",
       422
     );

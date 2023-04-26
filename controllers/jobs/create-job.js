@@ -9,10 +9,14 @@ const Creator = require("../../models/creator");
 const createJob = async (req, res, next) => {
   //make sure user inputs are valid
   const errors = validationResult(req);
-
+  //if any errors return an error
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new HttpError("invalid inputs passed, please check your data.", 422);
+    const error = new HttpError(
+      "invalid inputs passed, please check your data.",
+      422
+    );
+    return next(error);
   }
   //get userId
   const userId = req.params.uid;
@@ -57,6 +61,7 @@ const createJob = async (req, res, next) => {
         }
       });
       //if fields have been changed, save the fields.
+      //note changing the fields will update the creator object for each job by user
       if (shouldUpdate) {
         await creator.save();
       }
