@@ -14,7 +14,10 @@ const getUsers = async (req, res, next) => {
     return next(error);
   }
   //res json object of all users
-  res.json({ users: user.map((user) => user.toObject({ getters: true })) });
+  res.json({
+    ok: true,
+    users: user.map((user) => user.toObject({ getters: true })),
+  });
 };
 
 module.exports = getUsers;
