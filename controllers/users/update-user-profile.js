@@ -45,6 +45,12 @@ const updateUserProfile = async (req, res, next) => {
     }
   }
 
+  if (req.body.deleteResume) {
+    updatedFields.$pull = {
+      resume: { _id: req.body.deleteResume },
+    };
+  }
+
   //if user updates the email field, we make sure the email doesn't already exist.
   if (updatedFields.email) {
     //try to see if the email exists
@@ -88,7 +94,7 @@ const updateUserProfile = async (req, res, next) => {
   }
 
   //return updated user as json object
-  res.status(200).json({ user: updatedUser });
+  res.status(200).json({ ok: true, user: updatedUser });
 };
 
 module.exports = updateUserProfile;

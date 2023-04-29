@@ -37,7 +37,13 @@ const login = async (req, res, next) => {
   }
 
   //return successful login message
-  res.status(200).json({ ok: true, message: "logged in" });
+  res
+    .status(200)
+    .json({
+      ok: true,
+      message: "logged in",
+      user: identifiedUser.toObject({ getters: true }),
+    });
 };
 
 module.exports = login;

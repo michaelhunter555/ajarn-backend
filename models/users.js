@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
+const resumeSchema = require("./resume");
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -12,6 +13,7 @@ const userSchema = new Schema({
   credits: { type: Number, default: 0 },
   education: { type: String, default: "" },
   workExperience: { type: String, default: "" },
+  resume: { type: [resumeSchema], default: [] },
   interests: [{ type: String, default: [] }],
   highestCertification: { type: String, default: "" },
   about: { type: String, default: "" },

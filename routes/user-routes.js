@@ -29,16 +29,7 @@ router.get("/:uid", getUserById);
 router.patch("/:uid/add-credits", addCredits);
 
 //PATCH update Profile
-router.patch(
-  "/update-profile/:uid",
-  [
-    check("userType").custom((val) => {
-      const allowedUserType = ["teacher", "employer"];
-      return allowedUserType.includes(val);
-    }),
-  ],
-  updateUserProfile
-);
+router.patch("/update-profile/:uid", updateUserProfile);
 
 /* POST ROUTES */
 

@@ -23,7 +23,7 @@ const applyToJobById = async (req, res, next) => {
   const jobId = req.params.jid;
 
   //destructure request.body
-  const { coverLetter, resume } = req.body;
+  const { coverLetter } = req.body;
 
   //declare user and job variables
   let user;
@@ -51,7 +51,7 @@ const applyToJobById = async (req, res, next) => {
   const newApplication = new Application({
     userId,
     jobId,
-    resume: [resume],
+    resume: [user.resume],
     coverLetter,
   });
 
