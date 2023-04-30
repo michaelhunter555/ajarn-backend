@@ -32,6 +32,7 @@ const updateUserProfile = async (req, res, next) => {
     "highestCertification",
     "about",
     "skill",
+    "creator",
     "resume",
     "userType",
     "isHidden",
@@ -48,6 +49,12 @@ const updateUserProfile = async (req, res, next) => {
   if (req.body.deleteResume) {
     updatedFields.$pull = {
       resume: { _id: req.body.deleteResume },
+    };
+  }
+
+  if (req.body.deleteCreator) {
+    updatedFields.$pull = {
+      creator: { _id: req.body.deleteCreator },
     };
   }
 

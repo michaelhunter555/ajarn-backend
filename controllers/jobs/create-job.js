@@ -113,7 +113,7 @@ const createJob = async (req, res, next) => {
     return next(error);
   }
 
-  //pass created job data through object literal and push to dummy_jobs for now.
+  //send changes to database
   try {
     //start session
     const sess = await mongoose.startSession();
