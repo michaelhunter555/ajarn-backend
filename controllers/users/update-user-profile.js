@@ -83,24 +83,18 @@ const updateUserProfile = async (req, res, next) => {
     }
   }
 
-  console.log("req.body.creator", req.body.creator);
-
   const user = await User.findById(userId);
   const hasExistingCreator = user && user.creator;
   //temp, please delete once user object is complete
   if (req.body.creator && !hasExistingCreator) {
     try {
-      console.log("Trying to create a new Creator");
       const newCreator = new Creator({
         ...req.body.creator,
         _id: userId,
       });
-      console.log("New Creator created", newCreator);
       await newCreator.save();
-      console.log("New Creator saved");
       updatedFields.creator = newCreator;
     } catch (err) {
-      console.error("Error caught while adding a creator property", err);
       const error = new HttpError(
         "there was an issue with adding a creator property to your user object",
         500
