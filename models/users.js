@@ -19,7 +19,7 @@ const userSchema = new Schema({
   about: { type: String, default: "" },
   skill: [{ type: String, default: [] }],
   userType: { type: String, default: "teacher" },
-  creator: { type: mongoose.Types.ObjectId, ref: "Creator" },
+  creator: { type: mongoose.Types.ObjectId, default: null, ref: "Creator" },
   applications: [
     { type: mongoose.Types.ObjectId, required: false, ref: "Application" },
   ],

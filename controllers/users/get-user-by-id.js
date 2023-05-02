@@ -9,7 +9,7 @@ const getUserById = async (req, res, next) => {
   //declare user variable
   let user;
 
-  //try to find user
+  //try to find user and if they have a creator property
   try {
     user = await User.findById(userId);
   } catch (err) {
@@ -22,6 +22,18 @@ const getUserById = async (req, res, next) => {
   if (!user) {
     const error = new HttpError("Could not find user by this id.", 404);
     return next(error);
+  }
+
+  if (user.creator) {
+    try {
+      user = await User.findById(userId).populate("creator");
+    } catch (err) {
+      const error = new HttpError(
+        "there was an error populating creator data",
+        500
+      );
+      return next(error);
+    }
   }
 
   //json object of user data

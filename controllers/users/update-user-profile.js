@@ -1,5 +1,6 @@
 const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
+const Creator = require("../../models/creator");
 const { validationResult } = require("express-validator");
 
 //PATCH update userProfile
@@ -82,6 +83,48 @@ const updateUserProfile = async (req, res, next) => {
     }
   }
 
+  console.log("req.body.creator", req.body.creator);
+
+  const user = await User.findById(userId);
+  const hasExistingCreator = user && user.creator;
+  //temp, please delete once user object is complete
+  if (req.body.creator && !hasExistingCreator) {
+    try {
+      console.log("Trying to create a new Creator");
+      const newCreator = new Creator({
+        ...req.body.creator,
+        _id: userId,
+      });
+      console.log("New Creator created", newCreator);
+      await newCreator.save();
+      console.log("New Creator saved");
+      updatedFields.creator = newCreator;
+    } catch (err) {
+      console.error("Error caught while adding a creator property", err);
+      const error = new HttpError(
+        "there was an issue with adding a creator property to your user object",
+        500
+      );
+      return next(error);
+    }
+  }
+
+  if (req.body.creator && hasExistingCreator) {
+    // If the user already has a creator, update the existing creator
+    try {
+      await Creator.findByIdAndUpdate(user.creator, req.body.creator, {
+        new: true,
+      });
+    } catch (err) {
+      console.error("Error caught while updating creator property", err);
+      const error = new HttpError(
+        "there was an issue with updating the creator property of your user object",
+        500
+      );
+      return next(error);
+    }
+  }
+
   //declare update user variable
   let updatedUser;
 
@@ -92,6 +135,7 @@ const updateUserProfile = async (req, res, next) => {
       new: true,
     });
   } catch (err) {
+    console.log(err);
     //any issues with our request, return next error
     const error = new HttpError(
       "There was an issue trying to send a request for updating the user",
