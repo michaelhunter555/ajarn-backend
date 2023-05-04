@@ -14,7 +14,7 @@ const signup = async (req, res, next) => {
     );
   }
   //we expect name, email and password
-  const { name, email, password } = req.body;
+  const { name, email, password, userType } = req.body;
 
   //check if e-mail already exists
   let hasUser;
@@ -43,6 +43,8 @@ const signup = async (req, res, next) => {
     image:
       "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
     password,
+    userType,
+    isHidden: userType === "employer",
   });
 
   //try to create user
