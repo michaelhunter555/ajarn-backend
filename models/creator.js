@@ -9,6 +9,7 @@ const creatorSchema = new Schema({
   headquarters: { type: String, required: false },
   established: { type: Number, required: false },
   presence: [{ type: String, required: false }],
+  about: { type: String, required: false },
 });
 
 module.exports = mongoose.model("Creator", creatorSchema);
