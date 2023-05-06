@@ -62,14 +62,7 @@ router.post(
 //update jobById
 router.patch(
   "/:jid",
-  [
-    check("title").not().isEmpty(),
-    check("description").isLength({ min: 7 }),
-    check("jobType").custom((value) => {
-      const allowedJobType = ["basic", "featured", "flare"];
-      return allowedJobType.includes(value);
-    }),
-  ],
+  [check("title").not().isEmpty(), check("description").isLength({ min: 7 })],
   updateJobById
 );
 

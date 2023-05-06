@@ -45,7 +45,7 @@ const addCredits = async (req, res, next) => {
   }
 
   // Send a JSON response with a success message
-  res.status(200).json({ message: `added: ${credits} credits` });
+  res.status(200).json({ credits: user.credits });
 };
 
 module.exports = addCredits;

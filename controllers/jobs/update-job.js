@@ -11,6 +11,24 @@ const updateJobById = async (req, res, next) => {
     throw new HttpError("invalid inputs passed, please check your data.", 422);
   }
   const jobId = req.params.jid;
+  const creatorId = req.body.creatorId;
+
+  let job;
+
+  try {
+    job = await Job.findById(jobId);
+  } catch (err) {
+    const error = new HttpError(
+      `there was an issue finding this job by id`,
+      500
+    );
+    return next(error);
+  }
+
+  if (job.creator.toString() !== creatorId) {
+    const error = new HttpError("You are not allowed to edit this job", 401);
+    return next(error);
+  }
 
   let updatedFields = {};
   const jobFieldsList = ["title", "description", "jobType", "creator"];
@@ -24,7 +42,7 @@ const updateJobById = async (req, res, next) => {
   let updatedJob;
 
   try {
-    updatedJob = await Job.findByIdAndUpdate(jobId, updatedFields, {
+    updatedJob = await Job.findByAndUpdate(jobId, updatedFields, {
       new: true,
     });
   } catch (err) {
@@ -35,7 +53,7 @@ const updateJobById = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json({ job: updatedJob });
+  res.status(200).json({ job: updatedJob.toObject({ getters: true }) });
 };
 
 module.exports = updateJobById;
