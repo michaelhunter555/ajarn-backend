@@ -10,7 +10,13 @@ const getJobsByUserId = async (req, res, next) => {
   //try to find the jobs by userid
   try {
     //await job find by userid
-    user = await User.findById(userId).populate("jobs");
+    user = await User.findById(userId).populate({
+      path: "jobs",
+      populate: {
+        path: "creator",
+        model: "Creator",
+      },
+    });
   } catch (err) {
     console.log(err);
     //create error variable - return next error for GET request issues
@@ -21,7 +27,7 @@ const getJobsByUserId = async (req, res, next) => {
   //error conditions
   if (!user) {
     const error = new HttpError(
-      "Could not find sjob for the provided user id.",
+      "Could not find a job for the provided user id.",
       404
     );
     return next(error);

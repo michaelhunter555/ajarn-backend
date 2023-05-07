@@ -22,7 +22,7 @@ const getAllJobs = async (req, res, next) => {
     return next(error);
   }
   //organize jobs by date
-  const recentJobs = jobs.sort((a, b) => a.datePosted - b.datePosted);
+  const recentJobs = jobs.sort((a, b) => b.datePosted - a.datePosted);
 
   res.json({ jobs: recentJobs });
 };
