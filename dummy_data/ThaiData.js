@@ -72,6 +72,7 @@ let coreJobRequirements = [
   "CELTA",
   "DELTA",
   "MBA",
+  "TEFL",
 ];
 
 //github pulled list of nationalities

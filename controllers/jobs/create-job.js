@@ -54,6 +54,7 @@ const createJob = async (req, res, next) => {
       //get keys of creatorData object and check if the values are different.
       //if they are, update the creator fields.
       //set shoudUpdate to true if any fields are different
+      console.log(creatorData);
       Object.keys(creatorData).forEach((key) => {
         if (creatorData[key] !== creator[key]) {
           creator[key] = creatorData[key];
@@ -67,6 +68,7 @@ const createJob = async (req, res, next) => {
       }
     }
   } catch (err) {
+    //console.log(err);
     const error = new HttpError("Error with finding/creating creator", 500);
     return next(error);
   }
@@ -138,7 +140,9 @@ const createJob = async (req, res, next) => {
   }
 
   //res json createJob object
-  res.status(201).json({ job: createdJob.toObject({ getters: true }) });
+  res
+    .status(201)
+    .json({ ok: true, job: createdJob.toObject({ getters: true }) });
 };
 
 module.exports = createJob;
