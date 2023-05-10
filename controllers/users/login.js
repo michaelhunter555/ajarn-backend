@@ -14,10 +14,11 @@ const login = async (req, res, next) => {
   //check if user exists
   const { email, password } = req.body;
 
-  //match userId to id in request
+  //declare variable
   let identifiedUser;
 
   try {
+    //try to find the user by email
     identifiedUser = await User.findOne({ email: email });
   } catch (err) {
     const error = new HttpError(
@@ -27,7 +28,7 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  //if user data does not exist, throw an error.
+  //if user data does not exist, or the password is incorrect, throw an error.
   if (!identifiedUser || identifiedUser.password !== password) {
     const error = new HttpError(
       "there was an issue with logging you in. Check your email or password.",
@@ -36,14 +37,12 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  //return successful login message
-  res
-    .status(200)
-    .json({
-      ok: true,
-      message: "logged in",
-      user: identifiedUser.toObject({ getters: true }),
-    });
+  //return user object on success
+  res.status(200).json({
+    ok: true,
+    message: "logged in",
+    user: identifiedUser.toObject({ getters: true }),
+  });
 };
 
 module.exports = login;

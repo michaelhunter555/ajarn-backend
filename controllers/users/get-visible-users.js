@@ -12,7 +12,7 @@ const getVisibleUsers = async (req, res, next) => {
   } catch (err) {
     //if our request is bad, return next error.
     const error = new HttpError(
-      "tehre was an issue with retrieving visible users",
+      "there was an issue with retrieving visible users",
       500
     );
     return next(error);
