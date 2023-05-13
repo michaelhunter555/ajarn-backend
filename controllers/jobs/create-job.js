@@ -42,7 +42,7 @@ const createJob = async (req, res, next) => {
     creator = await Creator.findById(userId);
     //declare shouldUpdate as false and only true if our creator data for this job is different
     let shouldUpdate = false;
-    //if not the creator we create a new Creator object that user
+    //if not the creator we create a new Creator object for that user
     if (!creator) {
       creator = new Creator({
         //Creator id will take userId as a reference
