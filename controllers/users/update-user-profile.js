@@ -106,9 +106,13 @@ const updateUserProfile = async (req, res, next) => {
   if (req.body.creator && hasExistingCreator) {
     // If the user already has a creator, update the existing creator
     try {
-      await Creator.findByIdAndUpdate(user.creator, req.body.creator, {
-        new: true,
-      });
+      updatedFields.creator = await Creator.findByIdAndUpdate(
+        user.creator,
+        req.body.creator,
+        {
+          new: true,
+        }
+      );
     } catch (err) {
       console.error("Error caught while updating creator property", err);
       const error = new HttpError(
@@ -125,9 +129,8 @@ const updateUserProfile = async (req, res, next) => {
   //try to find user by id and update
   try {
     //find our user, updatable fields and set new to true to ensure a new an updated document in the response.
-    updatedUser = await User.findByIdAndUpdate(userId, updatedFields, {
-      new: true,
-    });
+    await User.findByIdAndUpdate(userId, updatedFields);
+    updatedUser = await User.findById(userId).populate("creator");
   } catch (err) {
     console.log(err);
     //any issues with our request, return next error

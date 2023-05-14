@@ -31,11 +31,10 @@ const updateVisibility = async (req, res, next) => {
     );
     next(error);
   }
-  //set isHidden property to new boolean value
-  user.isHidden = isHidden;
   //update isHidden property
   try {
     await User.updateOne({ _id: userId }, { $set: { isHidden: isHidden } });
+    user = await User.findById(userId).populate("creator");
   } catch (err) {
     //if our request is bad, return next error
     const error = new HttpError(

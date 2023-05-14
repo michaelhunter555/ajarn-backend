@@ -99,9 +99,10 @@ const applyToJobById = async (req, res, next) => {
   }
 
   //associate application by user and job
+  let sess;
   try {
     //state mongoose session
-    const sess = await mongoose.startSession();
+    sess = await mongoose.startSession();
     //start transaction
     sess.startTransaction();
     //save new application data
@@ -123,6 +124,10 @@ const applyToJobById = async (req, res, next) => {
       500
     );
     return next(error);
+  } finally {
+    if (sess) {
+      sess.endSession();
+    }
   }
 
   //upon succesful submission, render success message.

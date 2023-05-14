@@ -9,6 +9,7 @@ const login = require("../controllers/users/login");
 const updateUserProfile = require("../controllers/users/update-user-profile");
 const addCredits = require("../controllers/users/add-credits");
 const applyToJobById = require("../controllers/users/apply-to-job");
+const updateUserRole = require("../controllers/users/update-user-role");
 const { check } = require("express-validator");
 const { thaiCities } = require("../dummy_data/ThaiData");
 
@@ -55,6 +56,8 @@ router.post(
 //PATCH update profile visiblity
 router.patch("/update-visibility/:uid", updateVisibility);
 
+//PATCH update userRole (userType)
+router.patch("/update-role/:uid", updateUserRole);
 //POST applyToJob
 router.post(
   "/:uid/apply/:jid",

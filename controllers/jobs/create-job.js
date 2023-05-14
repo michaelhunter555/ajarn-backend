@@ -32,6 +32,7 @@ const createJob = async (req, res, next) => {
     workPermit,
     jobType,
     creatorData,
+    credits,
   } = req.body;
 
   //declare creator variable for Creator object
@@ -106,6 +107,12 @@ const createJob = async (req, res, next) => {
     return next(error);
   }
 
+  //check user credits
+  if (user.credits < credits) {
+    const error = new HttpError("Insufficient credits", 400);
+    return next(error);
+  }
+
   //if user has their userType property set to teacher, return next error.
   if (user.userType === "teacher") {
     const error = new HttpError(
@@ -116,9 +123,10 @@ const createJob = async (req, res, next) => {
   }
 
   //send changes to database
+  let sess;
   try {
     //start session
-    const sess = await mongoose.startSession();
+    sess = await mongoose.startSession();
     //start transaction
     sess.startTransaction();
     //save the creator information
@@ -127,6 +135,8 @@ const createJob = async (req, res, next) => {
     await createdJob.save({ session: sess });
     //push the created job to user jobs
     user.jobs.push(createdJob);
+    //subtract total credits
+    user.credits = user.credits - credits;
     //save the updated user data
     await user.save({ session: sess });
     //commit transaction
@@ -137,6 +147,10 @@ const createJob = async (req, res, next) => {
     console.log(err);
     const error = new HttpError("Creating job failed, please try again", 500);
     return next(error);
+  } finally {
+    if (sess) {
+      sess.endSession();
+    }
   }
 
   //res json createJob object

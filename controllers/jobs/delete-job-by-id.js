@@ -25,9 +25,10 @@ const deleteJobById = async (req, res, next) => {
     throw new HttpError("Could not find a place for that id", 404);
   }
 
+  let sess;
   try {
     //start mongoose session
-    const sess = await mongoose.startSession();
+    sess = await mongoose.startSession();
     //start transaction
     sess.startTransaction();
     //delete job from database
@@ -44,6 +45,10 @@ const deleteJobById = async (req, res, next) => {
     //return next error if our request has issues
     const error = new HttpError("There was an error with the request", 500);
     return next(error);
+  } finally {
+    if (sess) {
+      sess.endSession();
+    }
   }
   //confirm job is deleted message
   res.status(200).json({ message: "deleted a job" });
