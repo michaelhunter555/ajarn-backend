@@ -1,3 +1,5 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
 const { validationResult } = require("express-validator");
@@ -40,8 +42,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image:
-      "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+    image: req.file.path,
     password,
     userType,
     isHidden: userType === "employer",
