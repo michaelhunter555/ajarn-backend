@@ -34,17 +34,19 @@ const applyToJobById = async (req, res, next) => {
     job = await Job.findById(jobId);
   } catch (err) {
     const error = new HttpError(
-      "There was an issue with the request to find the user"
+      `There was an issue with the request to find the user: ${err}`
     );
     return next(error);
   }
-  //if either the userId or jobId doesn't exist, return next error'
-  if (!user || !job) {
-    const error = new HttpError(
-      "Could not find user or job for the provided ids",
-      404
-    );
-    return next(error);
+
+  //if not the correct user, throw an error
+  if (!user) {
+    throw new HttpError("User not found", 404);
+  }
+
+  //if not the correct job, throw an error.
+  if (!job) {
+    throw new HttpError("Job not found", 404);
   }
 
   //our Application Object takes userId, jobId, resume, coverLetter
@@ -57,7 +59,7 @@ const applyToJobById = async (req, res, next) => {
 
   //only teachers can apply to jobs, employers cannot
   if (user.userType !== "teacher") {
-    const error = new HttpError("You must be a teacher to apply to jobs.", 404);
+    const error = new HttpError("You must be a teacher to apply to jobs.", 403);
     return next(error);
   }
 
@@ -86,16 +88,6 @@ const applyToJobById = async (req, res, next) => {
       404
     );
     return next(error);
-  }
-
-  //if not the correct user, throw an error
-  if (!user) {
-    throw new HttpError("User not found", 404);
-  }
-
-  //if not the correct job, throw an error.
-  if (!job) {
-    throw new HttpError("Job not found", 404);
   }
 
   //associate application by user and job
@@ -131,7 +123,9 @@ const applyToJobById = async (req, res, next) => {
   }
 
   //upon succesful submission, render success message.
-  res.status(200).json({ message: "Application submitted" });
+  res
+    .status(200)
+    .json({ ok: true, user: user.applications, message: "success" });
 };
 
 module.exports = applyToJobById;
