@@ -62,10 +62,6 @@ router.patch("/update-visibility/:uid", updateVisibility);
 router.patch("/update-role/:uid", updateUserRole);
 
 //POST applyToJob
-router.post(
-  "/:uid/apply/:jid",
-  [check("resume").not().isEmpty()],
-  applyToJobById
-);
+router.post("/:uid/apply/:jid", applyToJobById);
 
 module.exports = router;

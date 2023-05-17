@@ -12,10 +12,20 @@ const getJobsByUserId = async (req, res, next) => {
     //await job find by userid
     user = await User.findById(userId).populate({
       path: "jobs",
-      populate: {
-        path: "creator",
-        model: "Creator",
-      },
+      populate: [
+        {
+          path: "creator",
+          model: "Creator",
+        },
+        {
+          path: "applicants",
+          model: "Application",
+          populate: {
+            path: "userId",
+            model: "Users",
+          },
+        },
+      ],
     });
   } catch (err) {
     console.log(err);

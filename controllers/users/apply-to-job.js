@@ -33,6 +33,7 @@ const applyToJobById = async (req, res, next) => {
     user = await User.findById(userId);
     job = await Job.findById(jobId);
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       `There was an issue with the request to find the user: ${err}`
     );
@@ -123,9 +124,7 @@ const applyToJobById = async (req, res, next) => {
   }
 
   //upon succesful submission, render success message.
-  res
-    .status(200)
-    .json({ ok: true, user: user.applications, message: "success" });
+  res.status(200).json({ ok: true, user: user, message: "success" });
 };
 
 module.exports = applyToJobById;
