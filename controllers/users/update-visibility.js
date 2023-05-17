@@ -1,8 +1,18 @@
 const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
+const { validationResult } = require("express-validator");
 
 //POST update user visibility in results page
 const updateVisibility = async (req, res, next) => {
+  const error = validationResult(req);
+  //just to be sure the user sends
+  if (!error.isEmpty()) {
+    throw new HttpError(
+      "There was an error with the validation result for this.",
+      500
+    );
+  }
+
   //request userId params
   const userId = req.params.uid;
 

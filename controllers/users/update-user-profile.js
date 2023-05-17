@@ -54,9 +54,8 @@ const updateUserProfile = async (req, res, next) => {
   }
 
   if (req.body.deleteCreator) {
-    updatedFields.$pull = {
-      creator: { _id: req.body.deleteCreator },
-    };
+    await Creator.findByIdAndDelete(req.body.deleteCreator);
+    updatedFields.creator = null;
   }
 
   //if user updates the email field, we make sure the email doesn't already exist.

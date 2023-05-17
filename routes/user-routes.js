@@ -60,6 +60,7 @@ router.patch("/update-visibility/:uid", updateVisibility);
 
 //PATCH update userRole (userType)
 router.patch("/update-role/:uid", updateUserRole);
+
 //POST applyToJob
 router.post(
   "/:uid/apply/:jid",
