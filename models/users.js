@@ -13,6 +13,7 @@ const userSchema = new Schema({
   credits: { type: Number, default: 0 },
   education: { type: String, default: "" },
   workExperience: { type: String, default: "" },
+  coverLetter: { type: String, default: "" },
   resume: { type: [resumeSchema], default: [] },
   interests: [{ type: String, default: [] }],
   highestCertification: { type: String, default: "" },

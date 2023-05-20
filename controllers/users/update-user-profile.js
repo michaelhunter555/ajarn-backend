@@ -37,6 +37,7 @@ const updateUserProfile = async (req, res, next) => {
     "resume",
     "userType",
     "isHidden",
+    "coverLetter",
   ];
 
   //loop over the fields and see if the field is empty or not.
