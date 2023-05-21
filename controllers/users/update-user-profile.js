@@ -41,19 +41,21 @@ const updateUserProfile = async (req, res, next) => {
   ];
 
   //loop over the fields and see if the field is empty or not.
-  //if it's not empty, add it to existing data to the req.body
+  //if it's not empty, set it equal to existing data to the req.body
   for (const key of findExistingFields) {
     if (req.body[key] !== undefined) {
       updatedFields[key] = req.body[key];
     }
   }
 
+  //for handling the deletion of a resume item
   if (req.body.deleteResume) {
     updatedFields.$pull = {
       resume: { _id: req.body.deleteResume },
     };
   }
 
+  //for handling the deletion of a creator account.
   if (req.body.deleteCreator) {
     await Creator.findByIdAndDelete(req.body.deleteCreator);
     updatedFields.creator = null;
@@ -85,7 +87,6 @@ const updateUserProfile = async (req, res, next) => {
 
   const user = await User.findById(userId);
   const hasExistingCreator = user && user.creator;
-  //temp, please delete once user object is complete
   if (req.body.creator && !hasExistingCreator) {
     try {
       const newCreator = new Creator({
