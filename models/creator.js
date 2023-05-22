@@ -5,6 +5,7 @@ const creatorSchema = new Schema({
   _id: { type: mongoose.Types.ObjectId, required: true, ref: "Users" },
   company: { type: String, required: false },
   logoUrl: { type: String, required: false },
+  image: { type: String, default: "" },
   companySize: { type: String, required: false },
   headquarters: { type: String, required: false },
   established: { type: Number, required: false },

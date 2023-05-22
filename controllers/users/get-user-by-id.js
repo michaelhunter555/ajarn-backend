@@ -11,7 +11,7 @@ const getUserById = async (req, res, next) => {
 
   //try to find user and if they have a creator property
   try {
-    user = await User.findById(userId);
+    user = await User.findById(userId).populate("applications");
   } catch (err) {
     //if issues with our call, return next error
     const error = new HttpError("There was an issue with the request", 500);

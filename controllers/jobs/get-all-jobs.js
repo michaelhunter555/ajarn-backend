@@ -7,12 +7,17 @@ const getAllJobs = async (req, res, next) => {
   let jobs;
   //find all job objects
   try {
-    jobs = await Job.find({}).populate({
-      path: "creator",
-      //specify fields to be populated
-      select:
-        "_id company logoUrl companySize headquarters established presence",
-    });
+    jobs = await Job.find({})
+      .populate({
+        path: "creator",
+        //specify fields to be populated
+        select:
+          "_id company logoUrl companySize headquarters established presence image",
+      })
+      .populate({
+        path: "applicants",
+        select: "applicationDate userId",
+      });
   } catch (err) {
     //if our request is bad return next error
     const error = new HttpError(

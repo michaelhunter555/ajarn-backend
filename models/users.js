@@ -30,6 +30,7 @@ const userSchema = new Schema({
     { type: mongoose.Types.ObjectId, required: false, ref: "Jobs" },
   ],
 });
+
 userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model("Users", userSchema);
