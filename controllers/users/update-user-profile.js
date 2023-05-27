@@ -85,15 +85,20 @@ const updateUserProfile = async (req, res, next) => {
     }
   }
 
+  //for adding creator property
   const user = await User.findById(userId);
+  //check if user has a creator property
   const hasExistingCreator = user && user.creator;
+  //if incoming request is for new creator, check if property exists, if not, we create a new one for user.
   if (req.body.creator && !hasExistingCreator) {
     try {
       const newCreator = new Creator({
         ...req.body.creator,
         _id: userId,
       });
+      //save new creator profile
       await newCreator.save();
+      //update fields for a new creator on user object
       updatedFields.creator = newCreator;
     } catch (err) {
       const error = new HttpError(
@@ -104,8 +109,8 @@ const updateUserProfile = async (req, res, next) => {
     }
   }
 
+  // If the user already has a creator acct, update the existing one
   if (req.body.creator && hasExistingCreator) {
-    // If the user already has a creator, update the existing creator
     try {
       updatedFields.creator = await Creator.findByIdAndUpdate(
         user.creator,
@@ -129,8 +134,9 @@ const updateUserProfile = async (req, res, next) => {
 
   //try to find user by id and update
   try {
-    //find our user, updatable fields and set new to true to ensure a new an updated document in the response.
+    //find our user and updatable fields.
     await User.findByIdAndUpdate(userId, updatedFields);
+    //populate creator data for user
     updatedUser = await User.findById(userId).populate("creator");
   } catch (err) {
     console.log(err);

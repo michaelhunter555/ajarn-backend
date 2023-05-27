@@ -76,9 +76,10 @@ const applyToJobById = async (req, res, next) => {
       const applicationDate = new Date(application.applicationDate);
       //simple subtraction
       const timeSinceLastApplication = now - applicationDate;
-      //if it hasn't been at least 30 days, then we return false
+      //if true, all is good is good. if false, we will return an error message in if statement below
       return timeSinceLastApplication <= thirtyDays;
     }
+    //did not apply? return false
     return false;
   });
 
