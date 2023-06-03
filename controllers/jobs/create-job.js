@@ -74,22 +74,6 @@ const createJob = async (req, res, next) => {
     return next(error);
   }
 
-  //in the future for google maps note that location will need lat & lng key.
-  const createdJob = new Job({
-    datePosted: new Date().toISOString(),
-    title,
-    location,
-    image:
-      "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
-    salary,
-    requirements,
-    description,
-    hours,
-    workPermit,
-    jobType,
-    creator: creator._id,
-  });
-
   //declare user variable
   let user;
 
@@ -121,6 +105,23 @@ const createJob = async (req, res, next) => {
     );
     return next(error);
   }
+
+  //in the future for google maps note that location will need lat & lng key.
+  const createdJob = new Job({
+    datePosted: new Date().toISOString(),
+    title,
+    location,
+    image:
+      user.creator.image ||
+      "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
+    salary,
+    requirements,
+    description,
+    hours,
+    workPermit,
+    jobType,
+    creator: creator._id,
+  });
 
   //send changes to database
   let sess;

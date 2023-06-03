@@ -62,6 +62,14 @@ router.patch("/update-visibility/:uid", updateVisibility);
 router.patch("/update-role/:uid", updateUserRole);
 
 //POST applyToJob
-router.post("/:uid/apply/:jid", applyToJobById);
+router.post(
+  "/:uid/apply/:jid",
+  [
+    check("userType").custom((user) => {
+      return user === "teacher";
+    }),
+  ],
+  applyToJobById
+);
 
 module.exports = router;
