@@ -112,7 +112,7 @@ const createJob = async (req, res, next) => {
     title,
     location,
     image:
-      user.creator.image ||
+      user.image ||
       "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
     salary,
     requirements,
