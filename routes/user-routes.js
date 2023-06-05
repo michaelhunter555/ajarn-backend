@@ -10,6 +10,7 @@ const updateUserProfile = require("../controllers/users/update-user-profile");
 const addCredits = require("../controllers/users/add-credits");
 const applyToJobById = require("../controllers/users/apply-to-job");
 const updateUserRole = require("../controllers/users/update-user-role");
+const updateCreator = require("../controllers/users/update-creator");
 const fileUpload = require("../middleware/file-upload");
 const { check } = require("express-validator");
 const { thaiCities } = require("../dummy_data/ThaiData");
@@ -31,7 +32,11 @@ router.get("/:uid", getUserById);
 router.patch("/:uid/add-credits", addCredits);
 
 //PATCH update Profile
-router.patch("/update-profile/:uid", updateUserProfile);
+router.patch(
+  "/update-profile/:uid",
+  fileUpload.single("image"),
+  updateUserProfile
+);
 
 /* POST ROUTES */
 
@@ -60,6 +65,8 @@ router.patch("/update-visibility/:uid", updateVisibility);
 
 //PATCH update userRole (userType)
 router.patch("/update-role/:uid", updateUserRole);
+
+router.patch("/update-creator/:uid", updateCreator);
 
 //POST applyToJob
 router.post(

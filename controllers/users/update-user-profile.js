@@ -108,17 +108,19 @@ const updateUserProfile = async (req, res, next) => {
       return next(error);
     }
   }
-
+  let updatedCreator;
   // If the user already has a creator acct, update the existing one
   if (req.body.creator && hasExistingCreator) {
     try {
-      updatedFields.creator = await Creator.findByIdAndUpdate(
-        user.creator,
+      updatedCreator = await Creator.findByIdAndUpdate(
+        user.creator._id,
         req.body.creator,
+
         {
           new: true,
         }
       );
+      updatedFields.creator = updatedCreator._id;
     } catch (err) {
       console.error("Error caught while updating creator property", err);
       const error = new HttpError(
@@ -129,6 +131,11 @@ const updateUserProfile = async (req, res, next) => {
     }
   }
 
+  if (req.file && updatedCreator) {
+    updatedCreator.image = req.file.path;
+    await updatedCreator.save();
+  }
+
   //declare update user variable
   let updatedUser;
 
@@ -137,7 +144,10 @@ const updateUserProfile = async (req, res, next) => {
     //find our user and updatable fields.
     await User.findByIdAndUpdate(userId, updatedFields);
     //populate creator data for user
-    updatedUser = await User.findById(userId).populate("creator");
+    updatedUser = await User.findById(userId).populate({
+      path: "creator",
+      select: "-creator",
+    });
   } catch (err) {
     console.log(err);
     //any issues with our request, return next error
