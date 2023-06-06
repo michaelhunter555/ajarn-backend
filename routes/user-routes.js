@@ -69,14 +69,6 @@ router.patch("/update-role/:uid", updateUserRole);
 router.patch("/update-creator/:uid", updateCreator);
 
 //POST applyToJob
-router.post(
-  "/:uid/apply/:jid",
-  [
-    check("userType").custom((user) => {
-      return user === "teacher";
-    }),
-  ],
-  applyToJobById
-);
+router.post("/:uid/apply/:jid", applyToJobById);
 
 module.exports = router;

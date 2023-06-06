@@ -131,14 +131,19 @@ const updateUserProfile = async (req, res, next) => {
     }
   }
 
-  if (req.file && updatedCreator) {
-    updatedCreator.image = req.file.path;
-    await updatedCreator.save();
+  //TEST IMAGE UPLOAD 1.1
+  if (req.file) {
+    user.image = req.file.path.toString();
+    try {
+      await user.save();
+    } catch (err) {
+      const error = new HttpError("Error Adding Image", 500);
+      return next(error);
+    }
   }
 
   //declare update user variable
   let updatedUser;
-
   //try to find user by id and update
   try {
     //find our user and updatable fields.
