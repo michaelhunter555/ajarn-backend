@@ -24,7 +24,6 @@ const updateUserProfile = async (req, res, next) => {
   const findExistingFields = [
     "name",
     "email",
-    "image",
     "location",
     "nationality",
     "education",
@@ -46,6 +45,11 @@ const updateUserProfile = async (req, res, next) => {
     if (req.body[key] !== undefined) {
       updatedFields[key] = req.body[key];
     }
+  }
+
+  const imageFile = req.file;
+  if (imageFile) {
+    updatedFields.image = req.file.path;
   }
 
   //for handling the deletion of a resume item
@@ -127,17 +131,6 @@ const updateUserProfile = async (req, res, next) => {
         "there was an issue with updating the creator property of your user object",
         500
       );
-      return next(error);
-    }
-  }
-
-  //TEST IMAGE UPLOAD 1.1
-  if (req.file) {
-    user.image = req.file.path.toString();
-    try {
-      await user.save();
-    } catch (err) {
-      const error = new HttpError("Error Adding Image", 500);
       return next(error);
     }
   }
