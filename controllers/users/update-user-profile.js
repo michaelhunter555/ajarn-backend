@@ -156,6 +156,8 @@ const updateUserProfile = async (req, res, next) => {
     return next(error);
   }
 
+  console.log(updatedUser.coverLetter);
+
   //return updated user as json object
   res.status(200).json({ ok: true, user: updatedUser });
 };

@@ -13,7 +13,8 @@ const updateUserRole = require("../controllers/users/update-user-role");
 const updateCreator = require("../controllers/users/update-creator");
 const fileUpload = require("../middleware/file-upload");
 const { check } = require("express-validator");
-const { thaiCities } = require("../dummy_data/ThaiData");
+//const checkAuth = require("../middleware/auth");
+//const { thaiCities } = require("../dummy_data/ThaiData");
 
 /* GET ROUTES */
 
@@ -26,19 +27,7 @@ router.get("/visible-users", getVisibleUsers);
 //GET find user by id
 router.get("/:uid", getUserById);
 
-/* PATCH ROUTES */
-
-//PATCH add credits
-router.patch("/:uid/add-credits", addCredits);
-
-//PATCH update Profile
-router.patch(
-  "/update-profile/:uid",
-  fileUpload.single("image"),
-  updateUserProfile
-);
-
-/* POST ROUTES */
+/* OPEN POST ROUTES */
 
 //POST sign-up post
 router.post(
@@ -60,15 +49,33 @@ router.post(
   login
 );
 
+//***check Authentication***
+//router.use(checkAuth);
+
+/* CLOSED POST ROUTE */
+
+//POST applyToJob
+router.post("/:uid/apply/:jid", applyToJobById);
+
+/* PATCH ROUTES */
+
 //PATCH update profile visiblity
 router.patch("/update-visibility/:uid", updateVisibility);
 
 //PATCH update userRole (userType)
 router.patch("/update-role/:uid", updateUserRole);
 
+//Patch update creator profile
 router.patch("/update-creator/:uid", updateCreator);
 
-//POST applyToJob
-router.post("/:uid/apply/:jid", applyToJobById);
+//PATCH add credits
+router.patch("/:uid/add-credits", addCredits);
+
+//PATCH update Profile
+router.patch(
+  "/update-profile/:uid",
+  fileUpload.single("image"),
+  updateUserProfile
+);
 
 module.exports = router;

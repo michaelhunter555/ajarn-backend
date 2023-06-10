@@ -16,6 +16,8 @@ const {
   coreJobRequirements,
 } = require("../dummy_data/ThaiData");
 
+const checkAuth = require("../middleware/auth");
+
 //Get all jobs
 router.get("/", getAllJobs);
 
@@ -24,6 +26,9 @@ router.get("/user/:uid", getJobsByUserId);
 
 //GET jobs by jobId
 router.get("/:jid", getJobById);
+
+//middleware to check for invalid token request
+router.use(checkAuth);
 
 //POST job
 router.post(

@@ -1,6 +1,8 @@
 const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 //POST user login
 const login = async (req, res, next) => {
@@ -29,19 +31,54 @@ const login = async (req, res, next) => {
   }
 
   //if user data does not exist, or the password is incorrect, throw an error.
-  if (!identifiedUser || identifiedUser.password !== password) {
+  if (!identifiedUser) {
     const error = new HttpError(
       "there was an issue with logging you in. Check your email or password.",
-      404
+      401
     );
+    return next(error);
+  }
+
+  let isValidPass = false;
+
+  try {
+    isValidPass = await bcrypt.compare(password, identifiedUser.password);
+  } catch (err) {
+    const error = new HttpError(
+      "there was an issue with logging you in. Check your email or password.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!isValidPass) {
+    const error = new HttpError("Incorrect Password, please try again.", 401);
+    return next(error);
+  }
+
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userId: identifiedUser._id,
+        email: identifiedUser.email,
+        userType: identifiedUser.userType,
+      },
+      process.env.SECRET_WEB_TOKEN,
+      { expiresIn: "1hr" }
+    );
+  } catch (err) {
+    const error = new HttpError("signing up failed, please try again", 500);
     return next(error);
   }
 
   //return user object on success
   res.status(200).json({
-    ok: true,
-    message: "logged in",
-    user: identifiedUser.toObject({ getters: true }),
+    userId: identifiedUser._id,
+    email: identifiedUser.email,
+    userType: identifiedUser.userType,
+    image: identifiedUser.image,
+    token: token,
   });
 };
 

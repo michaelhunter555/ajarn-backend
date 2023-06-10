@@ -3,6 +3,8 @@ dotenv.config();
 const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 //POST user sign-up
 const signup = async (req, res, next) => {
@@ -38,12 +40,21 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let encryptPassword;
+
+  try {
+    encryptPassword = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError("Could not create user please try again.", 500);
+    return next(error);
+  }
+
   //create new instance of User object with required fields
   const createdUser = new User({
     name,
     email,
     image: req.file.path,
-    password,
+    password: encryptPassword,
     userType,
     isHidden: userType === "employer",
   });
@@ -57,8 +68,21 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: createdUser._id, email: createdUser.email },
+      process.env.SECRET_WEB_TOKEN,
+      { expiresIn: "1hr" }
+    );
+  } catch (err) {
+    const error = new HttpError("signing up failed, please try again", 500);
+    return next(error);
+  }
   //render json data of new user
-  res.status(201).json({ user: createdUser.toObject({ getters: true }) });
+  res
+    .status(201)
+    .json({ userId: createdUser._id, email: createdUser.email, token: token });
 };
 
 module.exports = signup;
