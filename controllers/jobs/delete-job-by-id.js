@@ -26,6 +26,7 @@ const deleteJobById = async (req, res, next) => {
   }
 
   let sess;
+  let user;
   try {
     //start mongoose session
     sess = await mongoose.startSession();
@@ -34,7 +35,7 @@ const deleteJobById = async (req, res, next) => {
     //delete job from database
     await job.deleteOne({ _id: jobId }, { session: sess });
     //remove job from user id jobs
-    const user = await User.findById(job.creator._id);
+    user = await User.findById(job.creator._id);
     user.jobs.pull({ _id: jobId });
     //save the new user's changes
     await user.save({ session: sess });
@@ -51,7 +52,7 @@ const deleteJobById = async (req, res, next) => {
     }
   }
   //confirm job is deleted message
-  res.status(200).json({ message: "deleted a job" });
+  res.status(200).json({ message: "deleted a job", jobs: user.jobs });
 };
 
 module.exports = deleteJobById;
