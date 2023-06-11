@@ -1,3 +1,4 @@
+const fs = require("fs");
 const HttpError = require("../../models/http-error");
 const Job = require("../../models/jobs");
 const mongoose = require("mongoose");
@@ -25,6 +26,8 @@ const deleteJobById = async (req, res, next) => {
     throw new HttpError("Could not find a place for that id", 404);
   }
 
+  const imagePath = job.image;
+
   let sess;
   let user;
   try {
@@ -51,6 +54,11 @@ const deleteJobById = async (req, res, next) => {
       sess.endSession();
     }
   }
+
+  // fs.unlink(imagePath, (err) => {
+  //   console.log(err);
+  // });
+
   //confirm job is deleted message
   res.status(200).json({ message: "deleted a job", jobs: user.jobs });
 };

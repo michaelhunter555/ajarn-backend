@@ -82,7 +82,12 @@ const signup = async (req, res, next) => {
   //render json data of new user
   res
     .status(201)
-    .json({ userId: createdUser._id, email: createdUser.email, token: token });
+    .json({
+      userId: createdUser._id,
+      email: createdUser.email,
+      image: createdUser.image,
+      token: token,
+    });
 };
 
 module.exports = signup;

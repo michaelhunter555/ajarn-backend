@@ -15,10 +15,10 @@ const userSchema = new Schema({
   workExperience: { type: String, default: "" },
   coverLetter: { type: String, default: "" },
   resume: { type: [resumeSchema], default: [] },
-  interests: [{ type: String, default: [] }],
+  interests: { type: String, default: "" },
   highestCertification: { type: String, default: "" },
   about: { type: String, default: "" },
-  skill: [{ type: String, default: [] }],
+  skill: { type: String, default: "" },
   userType: { type: String, default: "teacher" },
   creator: { type: mongoose.Types.ObjectId, default: null, ref: "Creator" },
   applications: [
