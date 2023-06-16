@@ -26,6 +26,8 @@ const deleteJobById = async (req, res, next) => {
     throw new HttpError("Could not find a place for that id", 404);
   }
 
+  //add authentication check here
+
   const imagePath = job.image;
 
   let sess;

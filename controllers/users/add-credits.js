@@ -37,6 +37,7 @@ const addCredits = async (req, res, next) => {
   try {
     await user.save();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "there was an issue with saving the updated user credits",
       500
