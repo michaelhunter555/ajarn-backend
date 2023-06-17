@@ -31,7 +31,10 @@ const deleteJobById = async (req, res, next) => {
 
   //add authentication check here
   if (job.creator._id.toString() !== req.userData.userId) {
-    const error = new HttpError("Could not find a place for that id", 401);
+    const error = new HttpError(
+      "You are not authorized to delete this job.",
+      401
+    );
     return next(error);
   }
 
