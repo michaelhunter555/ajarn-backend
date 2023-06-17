@@ -23,12 +23,19 @@ const deleteJobById = async (req, res, next) => {
 
   //if null, no job was found for that id
   if (!job) {
-    throw new HttpError("Could not find a place for that id", 404);
+    const error = new HttpError("Could not find a place for that id", 404);
+    return next(error);
   }
 
-  //add authentication check here
+  console.log("Job.Creator Here:", job.creator._id);
 
-  const imagePath = job.image;
+  //add authentication check here
+  if (job.creator._id.toString() !== req.userData.userId) {
+    const error = new HttpError("Could not find a place for that id", 401);
+    return next(error);
+  }
+
+  // const imagePath = job.image;
 
   let sess;
   let user;
