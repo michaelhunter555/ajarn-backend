@@ -51,6 +51,7 @@ const updateUserProfile = async (req, res, next) => {
   if (imageFile) {
     updatedFields.image = req.file.path;
   }
+  console.log("request file:", req.file.path);
 
   //for handling the deletion of a resume item
   if (req.body.deleteResume) {
