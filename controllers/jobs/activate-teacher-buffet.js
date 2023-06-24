@@ -58,8 +58,8 @@ const activateBuffet = async (req, res, next) => {
 
   try {
     //update buffet to true
-    user.buffetIsActive = !buffetIsActive;
-    user.lastActiveDate = lastActiveDate;
+    user.buffetIsActive = buffetIsActive;
+    user.lastActiveBuffet = lastActiveDate;
     //deduct credits
     user.credits = user.credits - 2;
     //save updates

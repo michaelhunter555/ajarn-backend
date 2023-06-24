@@ -78,6 +78,7 @@ const login = async (req, res, next) => {
     email: identifiedUser.email,
     userType: identifiedUser.userType,
     image: identifiedUser.image,
+    buffetIsActive: identifiedUser.buffetIsActive,
     token: token,
   });
 };
