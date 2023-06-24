@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const checkAuth = require("../middleware/auth");
 const getAllJobs = require("../controllers/jobs/get-all-jobs");
 const getJobById = require("../controllers/jobs/get-job-by-id");
 const getJobsByUserId = require("../controllers/jobs/get-jobs-by-user-id");
 const createJob = require("../controllers/jobs/create-job");
 const updateJobById = require("../controllers/jobs/update-job");
 const deleteJobById = require("../controllers/jobs/delete-job-by-id");
+const activateBuffet = require("../controllers/jobs/activate-teacher-buffet");
 
 const { check } = require("express-validator");
 
@@ -15,8 +17,6 @@ const {
   partTimeSalaries,
   coreJobRequirements,
 } = require("../dummy_data/ThaiData");
-
-const checkAuth = require("../middleware/auth");
 
 //Get all jobs
 router.get("/", getAllJobs);
@@ -70,6 +70,9 @@ router.patch(
   [check("title").not().isEmpty(), check("description").isLength({ min: 7 })],
   updateJobById
 );
+
+//activate teacher buffet
+router.patch("/activate-buffet/:uid", activateBuffet);
 
 //delete jobById
 router.delete("/:jid", deleteJobById);

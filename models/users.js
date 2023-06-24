@@ -24,6 +24,8 @@ const userSchema = new Schema({
   applications: [
     { type: mongoose.Types.ObjectId, required: false, ref: "Application" },
   ],
+  buffetIsActive: { type: Boolean, default: false },
+  lastActiveBuffet: { type: Date, required: false },
   isHidden: { type: Boolean, default: false },
   jobs: [{ type: mongoose.Types.ObjectId, required: false, ref: "Jobs" }],
   createdJobs: [

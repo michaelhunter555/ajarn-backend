@@ -36,6 +36,26 @@ const getUserById = async (req, res, next) => {
     }
   }
 
+  if (user.buffetIsActive === true) {
+    const lastActiveBuffet = user.lastActiveBuffet.getTime();
+    const currentTime = new Date();
+    const timeDifference = currentTime.getTime() - lastActiveBuffet;
+    const buffetDuration = 24 * 60 * 60 * 1000;
+
+    if (timeDifference > buffetDuration) {
+      try {
+        user.buffetIsActive = false;
+        await user.save();
+      } catch (err) {
+        const error = new HttpError(
+          "Error updating user buffet activities.",
+          500
+        );
+        return next(error);
+      }
+    }
+  }
+
   //json object of user data
   res.json({ user: user.toObject({ getters: true }) });
 };

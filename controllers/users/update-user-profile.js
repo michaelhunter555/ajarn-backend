@@ -51,7 +51,7 @@ const updateUserProfile = async (req, res, next) => {
   if (imageFile) {
     updatedFields.image = req.file.path;
   }
-  console.log("request file:", req.file.path);
+  //console.log("request file:", req.file.path);
 
   //for handling the deletion of a resume item
   if (req.body.deleteResume) {
@@ -99,6 +99,7 @@ const updateUserProfile = async (req, res, next) => {
     try {
       const newCreator = new Creator({
         ...req.body.creator,
+        // _id set to userId - this is to associate creator account with userId
         _id: userId,
       });
       //save new creator profile
@@ -113,6 +114,7 @@ const updateUserProfile = async (req, res, next) => {
       return next(error);
     }
   }
+
   let updatedCreator;
   // If the user already has a creator acct, update the existing one
   if (req.body.creator && hasExistingCreator) {
@@ -157,7 +159,7 @@ const updateUserProfile = async (req, res, next) => {
     return next(error);
   }
 
-  console.log(updatedUser.coverLetter);
+  // console.log(updatedUser.coverLetter);
 
   //return updated user as json object
   res.status(200).json({ ok: true, user: updatedUser });

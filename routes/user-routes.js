@@ -65,7 +65,7 @@ router.patch("/update-visibility/:uid", updateVisibility);
 //PATCH update userRole (userType)
 router.patch("/update-role/:uid", updateUserRole);
 
-//Patch update creator profile
+//PATCH update creator profile
 router.patch("/update-creator/:uid", updateCreator);
 
 //PATCH add credits
