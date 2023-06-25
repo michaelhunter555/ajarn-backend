@@ -14,6 +14,7 @@ const updateCreator = require("../controllers/users/update-creator");
 const fileUpload = require("../middleware/file-upload");
 const IncomeDirectoryContribution = require("../controllers/users/add-income-directory");
 const getIncomeDirectoryInfo = require("../controllers/users/get-user-incomes");
+const getUserIncomePostById = require("../controllers/users/get-user-income-by-id");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -29,6 +30,8 @@ router.get("/visible-users", getVisibleUsers);
 
 //GET user income contribution posts
 router.get("/income-posts", getIncomeDirectoryInfo);
+
+router.get("/income-posts/:id", getUserIncomePostById);
 
 //GET find user by id
 router.get("/:uid", getUserById);
