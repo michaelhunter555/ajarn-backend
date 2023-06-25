@@ -12,7 +12,10 @@ const applyToJobById = require("../controllers/users/apply-to-job");
 const updateUserRole = require("../controllers/users/update-user-role");
 const updateCreator = require("../controllers/users/update-creator");
 const fileUpload = require("../middleware/file-upload");
+const IncomeDirectoryContribution = require("../controllers/users/add-income-directory");
+const getIncomeDirectoryInfo = require("../controllers/users/get-user-incomes");
 const { check } = require("express-validator");
+
 //const checkAuth = require("../middleware/auth");
 //const { thaiCities } = require("../dummy_data/ThaiData");
 
@@ -23,6 +26,9 @@ router.get("/", getUsers);
 
 //GET all visible users
 router.get("/visible-users", getVisibleUsers);
+
+//GET user income contribution posts
+router.get("/income-posts", getIncomeDirectoryInfo);
 
 //GET find user by id
 router.get("/:uid", getUserById);
@@ -53,6 +59,8 @@ router.post(
 //router.use(checkAuth);
 
 /* CLOSED POST ROUTE */
+//POST
+router.post("/income-directory/:uid", IncomeDirectoryContribution);
 
 //POST applyToJob
 router.post("/:uid/apply/:jid", applyToJobById);
