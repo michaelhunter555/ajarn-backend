@@ -75,6 +75,17 @@ let coreJobRequirements = [
   "TEFL",
 ];
 
+let blogCategories = [
+  "Teaching",
+  "Thai Life",
+  "Learning Thai",
+  "Current Events",
+  "Sponsored",
+  "How to",
+  "Dos and Donts",
+  "General",
+];
+
 //github pulled list of nationalities
 let nationalities = [
   "American",
@@ -291,4 +302,5 @@ module.exports = {
   partTimeSalaries,
   coreJobRequirements,
   nationalities,
+  blogCategories,
 };

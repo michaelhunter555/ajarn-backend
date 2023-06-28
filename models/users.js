@@ -15,6 +15,7 @@ const userSchema = new Schema({
   workExperience: { type: String, default: "" },
   coverLetter: { type: String, default: "" },
   resume: { type: [resumeSchema], default: [] },
+  blogPosts: [{ type: mongoose.Types.ObjectId, ref: "Blogs" }],
   interests: { type: String, default: "" },
   highestCertification: { type: String, default: "" },
   about: { type: String, default: "" },
