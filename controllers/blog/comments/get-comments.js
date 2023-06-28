@@ -5,15 +5,23 @@ const getCommentsByPostId = async (req, res, next) => {
   const blogId = req.params.bid;
 
   let comments;
+  let blog;
 
   try {
-    comments = await Blog.findById(blogId).populate("comments");
+    blog = await Blog.findById(blogId).populate("comments");
   } catch (err) {
     const error = new HttpError("There was an error with the request.", 500);
     return next(error);
   }
 
-  if (comments.length === 0) {
+  if (!blog) {
+    const error = new HttpError("Blog post not found.", 404);
+    return next(error);
+  }
+
+  comments = blog.comments;
+
+  if (!comments) {
     return;
   }
 

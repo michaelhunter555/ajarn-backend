@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 const deleteComment = async (req, res, next) => {
   const blogId = req.params.bid;
+  const commentId = req.params.cid;
 
   let blog;
 
@@ -26,7 +27,19 @@ const deleteComment = async (req, res, next) => {
     return next(error);
   }
 
-  if (blog.comments.userId !== req.userData.userId) {
+  const commentIndex = blog.comments.findIndex(
+    (c) => c._id.toString() === commentId
+  );
+
+  if (commentIndex === -1) {
+    const error = new HttpError(
+      "There was an error finding the comment by the given Id.",
+      404
+    );
+    return next(error);
+  }
+
+  if (blog.comments[commentIndex].userId.toString() !== req.userData.userId) {
     const error = new HttpError(
       "You are not authorized to delete this comment.",
       401
@@ -39,7 +52,7 @@ const deleteComment = async (req, res, next) => {
   try {
     sess = await mongoose.startSession();
     sess.startTransaction();
-    blog.comments.deleteOne({ _id: blogId }, { session: sess });
+    blog.comments.pull({ _id: commentId });
     await blog.save({ session: sess });
     await sess.commitTransaction();
     await blog.populate("comments");

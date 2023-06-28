@@ -12,7 +12,7 @@ const updateCommentByPostId = async (req, res, next) => {
 
   let blog;
   try {
-    blog = await User.findById(blogId);
+    blog = await Blog.findById(blogId);
   } catch (err) {
     const error = new HttpError(
       "There was an error with the request in updating comments.",
@@ -29,7 +29,19 @@ const updateCommentByPostId = async (req, res, next) => {
     return next(error);
   }
 
-  if (blog.comments.userId.toString() !== req.userData.userId) {
+  const commentIndex = blog.comments.findIndex(
+    (c) => c._id.toString() === userId
+  );
+
+  if (commentIndex === -1) {
+    const error = new HttpError(
+      "Could not find the comment by the given Id.",
+      404
+    );
+    return next(error);
+  }
+
+  if (blog.comments[commentIndex].userId.toString() !== req.userData.userId) {
     const error = new HttpError(
       "You are not authorized to udpate this comment",
       401
@@ -37,21 +49,13 @@ const updateCommentByPostId = async (req, res, next) => {
     return next(error);
   }
 
-  const updateComment = {
-    comments: [
-      ...blog.comments,
-      {
-        _id: userId,
-        ...updatedComment,
-      },
-    ],
+  blog.comments[commentIndex] = {
+    ...blog.comments[commentIndex],
+    ...updatedComment,
   };
 
-  let updatedBlogPostComments;
-
   try {
-    await Blog.findByIdAndUpdate(blogId, updateComment);
-    updatedBlogPostComments = await Blog.findById(blogId).populate("comments");
+    await blog.save();
   } catch (err) {
     const error = new HttpError(
       "There was an error with the request to update the post comments.",
@@ -60,7 +64,9 @@ const updateCommentByPostId = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(200).json({ updatedComments: updatedBlogPostComments, ok: true });
+  res
+    .status(200)
+    .json({ updatedComments: blog.comments[commentIndex], ok: true });
 };
 
 module.exports = updateCommentByPostId;
