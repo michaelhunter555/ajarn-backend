@@ -1,7 +1,6 @@
-const HttpError = require("../../models/http-error");
-const Blog = require("../../models/blog");
-const User = require("../../models/users");
 const mongoose = require("mongoose");
+const HttpError = require("../../../models/http-error");
+const Blog = require("../../../models/blog");
 
 const deleteComment = async (req, res, next) => {
   const blogId = req.params.bid;

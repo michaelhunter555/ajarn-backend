@@ -7,6 +7,8 @@ const { validationResult } = require("express-validator");
 const addNewBlogPost = async (req, res, next) => {
   const userId = req.params.uid;
 
+  console.log("userId", userId);
+
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
@@ -18,6 +20,8 @@ const addNewBlogPost = async (req, res, next) => {
   }
 
   const { title, postContent, category } = req.body;
+
+  console.log("blog post data", title, postContent, category);
 
   let user;
 
@@ -44,10 +48,10 @@ const addNewBlogPost = async (req, res, next) => {
   try {
     newBlogPost = new Blog({
       title: title,
-      name: user.name,
-      author: userId,
       postContent: postContent,
       category: category,
+      name: user.name,
+      author: userId,
       comments: [],
     });
   } catch (err) {
@@ -83,7 +87,7 @@ const addNewBlogPost = async (req, res, next) => {
     }
   }
 
-  res.status(201).json({ blogPost: newBlogPost, ok: true });
+  res.status(201).json({ blogPost: newBlogPost._id, ok: true });
 };
 
 module.exports = addNewBlogPost;

@@ -84,6 +84,7 @@ let blogCategories = [
   "How to",
   "Dos and Donts",
   "General",
+  "Question",
 ];
 
 //github pulled list of nationalities

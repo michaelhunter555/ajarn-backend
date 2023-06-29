@@ -10,7 +10,7 @@ const comments = new Schema({
 
 const blogSchema = new Schema({
   title: { type: String, required: true },
-  name: { type: String, required: true },
+  name: { type: String, default: "", required: false },
   postDate: { type: Date, default: Date.now },
   author: { type: mongoose.Types.ObjectId, required: true, ref: "Users" },
   postContent: { type: String, required: true },

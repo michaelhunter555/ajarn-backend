@@ -1,12 +1,19 @@
-const HttpError = require("../../models/http-error");
-const Blog = require("../../models/blog");
-const User = require("../../models/users");
+const HttpError = require("../../../models/http-error");
+const Blog = require("../../../models/blog");
+const User = require("../../../models/users");
 const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
 const updateCommentByPostId = async (req, res, next) => {
   const userId = req.params.uid;
   const blogId = req.params.bid;
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const error = new HttpError("Please make sure all inputs are valid.", 500);
+    throw error;
+  }
 
   const { updatedComment } = req.body;
 
