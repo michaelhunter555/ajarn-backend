@@ -1,7 +1,5 @@
 const HttpError = require("../../../models/http-error");
 const Blog = require("../../../models/blog");
-const User = require("../../../models/users");
-const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
 const updateCommentByPostId = async (req, res, next) => {

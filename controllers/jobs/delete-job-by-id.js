@@ -17,7 +17,7 @@ const deleteJobById = async (req, res, next) => {
     job = await Job.findById(jobId).populate("creator");
   } catch (err) {
     //if bad request, return next error
-    const error = new HttpError("There was an error with the request", 404);
+    const error = new HttpError("There was an error with the request", 500);
     return next(error);
   }
 

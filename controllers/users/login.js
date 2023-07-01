@@ -80,6 +80,9 @@ const login = async (req, res, next) => {
     image: identifiedUser.image,
     buffetIsActive: identifiedUser.buffetIsActive,
     token: token,
+    coverLetter: identifiedUser.coverLetter,
+    resume: identifiedUser.resume,
+    incomeDirectory: identifiedUser.incomeDirectory,
   });
 };
 

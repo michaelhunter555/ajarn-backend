@@ -12,7 +12,7 @@ const getAllJobs = async (req, res, next) => {
         path: "creator",
         //specify fields to be populated
         select:
-          "_id company logoUrl companySize headquarters established presence image",
+          "_id company logoUrl companySize headquarters established presence image about",
       })
       .populate({
         path: "applicants",
