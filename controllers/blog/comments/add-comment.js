@@ -43,7 +43,11 @@ const addComment = async (req, res, next) => {
   let blog;
 
   try {
-    blog = await Blog.findById(blogId);
+    blog = await Blog.findById(blogId).populate({
+      path: "comments.userId",
+      model: "Users",
+      select: "_id name workExperience userType image",
+    });
   } catch (err) {
     const error = new HttpError(
       "There was an error finding the blog post by Id.",
@@ -61,7 +65,7 @@ const addComment = async (req, res, next) => {
   }
 
   const newComment = {
-    name: user.name,
+    userId: userId,
     comment: postComment,
     commentDate: Date.now(),
   };
@@ -71,6 +75,7 @@ const addComment = async (req, res, next) => {
   try {
     await blog.save();
   } catch (err) {
+    console.log("COMMENT ERROR:", err);
     const error = new HttpError(
       "There was an error confirming the comment transaction.",
       500

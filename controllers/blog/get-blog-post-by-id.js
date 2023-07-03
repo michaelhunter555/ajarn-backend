@@ -16,7 +16,7 @@ const getBlogPostById = async (req, res, next) => {
       .populate({
         path: "comments.userId",
         model: "Users",
-        select: "name workExperience userType image",
+        select: "_id name workExperience userType image",
       });
   } catch (err) {
     const error = new HttpError(

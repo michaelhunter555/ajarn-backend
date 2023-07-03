@@ -25,7 +25,12 @@ router.get("/posts/:uid", getBlogPostByUserId);
 //router.get("/post/comments/:bid", getComments);
 
 //POST add a comment
-router.post("/add-comment/:uid/post/:bid", checkAuth, addComment);
+router.post(
+  "/add-comment/:uid/post/:bid",
+  [check("postComment").not().isEmpty()],
+  checkAuth,
+  addComment
+);
 
 //POST create blog post
 router.post(
