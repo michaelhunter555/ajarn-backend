@@ -6,15 +6,26 @@ const getBlogPostById = require("../controllers/blog/get-blog-post-by-id");
 const getBlogPostByUserId = require("../controllers/blog/get-blog-post-by-user-id");
 const updateBlogPostById = require("../controllers/blog/update-blog-post");
 const deleteBlogPostById = require("../controllers/blog/delete-blog-post");
+const likeContentPost = require("../controllers/blog/like-blog-post");
+const dislikeContentPost = require("../controllers/blog/dislike-blog");
 const addComment = require("../controllers/blog/comments/add-comment");
 const deleteComment = require("../controllers/blog/comments/delete-comment");
 const updateComment = require("../controllers/blog/comments/update-comment");
+const getCommentsByPostId = require("../controllers/blog/comments/get-comments");
+const likeComment = require("../controllers/blog/comments/like-comment");
+const dislikeComment = require("../controllers/blog/comments/dislike-comment");
+
 const { check } = require("express-validator");
 const checkAuth = require("../middleware/auth");
 const { blogCategories } = require("../dummy_data/ThaiData");
 
+/*GET Routes */
+
 //get blog
 router.get("/", getAllBlogPosts); //all blog post
+
+//GET all comments by blogId
+router.get("/post/comments/:bid", getCommentsByPostId);
 
 //GET blog post by id
 router.get("/post/:bid", getBlogPostById);
@@ -22,7 +33,7 @@ router.get("/post/:bid", getBlogPostById);
 //GET all blog posts by user id
 router.get("/posts/:uid", getBlogPostByUserId);
 
-//router.get("/post/comments/:bid", getComments);
+/*POST Routes */
 
 //POST add a comment
 router.post(
@@ -47,6 +58,20 @@ router.post(
   addNewBlogPost
 );
 
+/*PATCH Routes */
+
+//PATCH like Content Post
+router.patch("/post/:bid/like/:uid", checkAuth, likeContentPost);
+
+//PATCH dislike Content Post
+router.patch("/post/:bid/dislike/:uid", checkAuth, dislikeContentPost);
+
+//PATCH like Comment Post
+router.patch("/post/:bid/comment/like/:uid", checkAuth, likeComment);
+
+//PATCH dislike Comment Post
+router.patch("/post/:bid/comment/dislike/:uid", checkAuth, dislikeComment);
+
 //PATCH update blog post
 router.patch(
   "/post/:bid",
@@ -69,6 +94,9 @@ router.patch(
   checkAuth,
   updateComment
 );
+
+/*DELETE Routes */
+
 //DELETE delete comment
 router.delete("/delete-comment/:cid/post/:bid", checkAuth, deleteComment);
 
