@@ -3,6 +3,8 @@ const User = require("../../models/users");
 const Blog = require("../../models/blog");
 const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
+const createDOMPurify = require("dompurify");
+const { JSDOM } = require("jsdom");
 
 const addNewBlogPost = async (req, res, next) => {
   const userId = req.params.uid;
@@ -22,6 +24,10 @@ const addNewBlogPost = async (req, res, next) => {
   const { title, postContent, category } = req.body;
 
   console.log("blog post data", title, postContent, category);
+
+  const window = new JSDOM("").window;
+  const DOMPurify = createDOMPurify(window);
+  const sanitizedPostContent = DOMPurify.sanitize(postContent);
 
   let user;
 
@@ -48,7 +54,7 @@ const addNewBlogPost = async (req, res, next) => {
   try {
     newBlogPost = new Blog({
       title: title,
-      postContent: postContent,
+      postContent: sanitizedPostContent,
       category: category,
       name: user.name,
       author: userId,
