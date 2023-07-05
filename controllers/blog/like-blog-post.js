@@ -24,9 +24,6 @@ const likeContentPost = async (req, res, next) => {
     return next(error);
   }
 
-  console.log("userObj:", user);
-  console.log("blogObj", blog);
-
   if (!user) {
     const error = new HttpError(
       "Could not find the user by the given Id.",
@@ -40,34 +37,45 @@ const likeContentPost = async (req, res, next) => {
     return next(error);
   }
 
-  const userDislikedPostAlready = blog.interactions.some(
+  const userLikedPostIndex = blog.interactions.findIndex(
     (interaction) =>
-      interaction.userId === user._id.toString() && interaction.dislike === true
+      interaction.userId.toString() === userId && interaction.like === true
   );
 
-  let userLikedPost;
-  if (userDislikedPostAlready) {
-    userLikedPost = {
+  const userDislikedPostIndex = blog.interactions.findIndex(
+    (interaction) =>
+      interaction.userId.toString() === userId && interaction.dislike === true
+  );
+
+  let updatedLikes = 0;
+
+  if (userLikedPostIndex === -1) {
+    if (userDislikedPostIndex !== -1) {
+      blog.interactions.splice(userDislikedPostIndex, 1);
+    }
+
+    blog.interactions.push({
       userId: userId,
       postId: blogId,
-      like: !postLike, // !postLike - if user clicks Like twice it will unlike.
+      like: true, // !postLike - if user clicks Like twice it will unlike.
       dislike: false, // set dislike to false
-    };
+    });
+    updatedLikes = blog.interactions.filter(
+      (action) => action.like === true
+    ).length;
   } else {
-    userLikedPost = {
-      userId: userId,
-      postId: blogId,
-      like: !postLike, // !postLike - if user clicks Like twice it will unlike.
-    };
+    blog.interactions.splice(userLikedPostIndex, 1);
   }
-  console.log("LIKED POST OBJECT userLikedPost =", userLikedPost);
+
+  updatedLikes = blog.interactions.filter(
+    (action) => action.like === true
+  ).length;
 
   let sess;
 
   try {
     sess = await mongoose.startSession();
     sess.startTransaction();
-    blog.interactions.push(userLikedPost);
     await blog.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
@@ -82,12 +90,8 @@ const likeContentPost = async (req, res, next) => {
       sess.endSession();
     }
   }
-  const totalLikes = blog.interactions
-    ? blog.interactions.filter((interaction) => interaction.like === true)
-        .length
-    : 0;
 
-  res.status(200).json({ ContentLikes: totalLikes });
+  res.status(200).json({ ContentLikes: updatedLikes });
 };
 
 module.exports = likeContentPost;

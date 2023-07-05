@@ -8,6 +8,8 @@ const updateBlogPostById = require("../controllers/blog/update-blog-post");
 const deleteBlogPostById = require("../controllers/blog/delete-blog-post");
 const likeContentPost = require("../controllers/blog/like-blog-post");
 const dislikeContentPost = require("../controllers/blog/dislike-blog");
+const getPostLikesById = require("../controllers/blog/get-post-likes-by-id");
+const getPostDislikesById = require("../controllers/blog/get-post-dislikes-by-id");
 const addComment = require("../controllers/blog/comments/add-comment");
 const deleteComment = require("../controllers/blog/comments/delete-comment");
 const updateComment = require("../controllers/blog/comments/update-comment");
@@ -26,6 +28,12 @@ router.get("/", getAllBlogPosts); //all blog post
 
 //GET all comments by blogId
 router.get("/post/comments/:bid", getCommentsByPostId);
+
+//GET all likes for Post
+router.get("/post/likes/:bid", getPostLikesById);
+
+//GET all Dislikes for Post
+router.get("/post/dislikes/:bid", getPostDislikesById);
 
 //GET blog post by id
 router.get("/post/:bid", getBlogPostById);

@@ -20,9 +20,10 @@ const dislikeContentPost = async (req, res, next) => {
   const { postDislike } = req.body;
 
   let user;
-
+  let blog;
   try {
     user = await User.findById(userId);
+    blog = await Blog.findById(blogId);
   } catch (err) {
     const error = new HttpError(
       "There was an error finding the user by the given Id.",
@@ -39,50 +40,48 @@ const dislikeContentPost = async (req, res, next) => {
     return next(error);
   }
 
-  let blog;
-
-  try {
-    blog = await Blog.findById(blogId);
-  } catch (err) {
-    const error = new HttpError(
-      "There was an error finding the blog by the given Id.",
-      500
-    );
-    return next(error);
-  }
-
   if (!blog) {
     const error = new HttpError("Could not find a blog by the given Id.", 404);
     return next(error);
   }
 
-  let userDislikedPost;
-  let userLikedPostAlready = blog.interactions.some(
+  const userDislikedPostIndex = blog.interactions.findIndex(
     (interaction) =>
-      interaction.userId === user._id && interaction.like === true
+      interaction.userId.toString() === userId && interaction.dislike === true
   );
 
-  if (userLikedPostAlready) {
-    userDislikedPost = {
+  const userLikedPostIndex = blog.interactions.findIndex(
+    (interaction) =>
+      interaction.userId.toString() === userId && interaction.like === true
+  );
+
+  let updatedDislikes = 0;
+
+  if (userDislikedPostIndex === -1) {
+    if (userLikedPostIndex !== -1) {
+      blog.interactions.splice(userLikedPostIndex, 1);
+    }
+    blog.interactions.push({
       userId: user._id,
       postId: blogId,
       like: false, //set like to false
-      dislike: !postDislike, // to dislike and undislike a post
-    };
+      dislike: true, // to dislike and undislike a post
+    });
+    updatedDislikes = blog.interactions.filter(
+      (action) => action.dislike === true
+    ).length;
   } else {
-    userDislikedPost = {
-      userId: user._id,
-      postId: blogId,
-      dislike: !postDislike, // to dislike and undislike a post
-    };
+    blog.interactions.splice(userDislikedPostIndex, 1);
   }
+  updatedDislikes = blog.interactions.filter(
+    (action) => action.dislike === true
+  ).length;
 
   let sess;
 
   try {
     sess = await mongoose.startSession();
     sess.startTransaction();
-    blog.interactions.push(userDislikedPost);
     await blog.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
@@ -97,12 +96,7 @@ const dislikeContentPost = async (req, res, next) => {
     }
   }
 
-  const totalDislikes = blog.interactions
-    ? blog.interactions.filter((interaction) => interaction.dislike === true)
-        .length
-    : 0;
-
-  res.status(200).json({ contentDislikes: totalDislikes });
+  res.status(200).json({ contentDislikes: updatedDislikes });
 };
 
 module.exports = dislikeContentPost;

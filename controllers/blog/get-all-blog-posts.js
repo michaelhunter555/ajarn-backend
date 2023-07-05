@@ -7,7 +7,7 @@ const getAllBlogPosts = async (req, res, next) => {
   try {
     blogPosts = await Blog.find({}).populate({
       path: "author",
-      select: "_id name image",
+      select: "_id name image userType",
     });
   } catch (err) {
     const error = new HttpError(

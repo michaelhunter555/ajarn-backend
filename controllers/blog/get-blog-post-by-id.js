@@ -11,7 +11,7 @@ const getBlogPostById = async (req, res, next) => {
       .populate({
         path: "author",
         model: "Users",
-        select: "_id name image",
+        select: "_id name image userType",
       })
       .populate({
         path: "comments.userId",
