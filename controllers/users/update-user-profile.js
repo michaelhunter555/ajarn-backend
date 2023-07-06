@@ -2,6 +2,8 @@ const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
 const Creator = require("../../models/creator");
 const { validationResult } = require("express-validator");
+const { JSDOM } = require("jsdom");
+const createDOMPurify = require("dompurify");
 
 //PATCH update userProfile
 const updateUserProfile = async (req, res, next) => {
@@ -45,6 +47,15 @@ const updateUserProfile = async (req, res, next) => {
     if (req.body[key] !== undefined) {
       updatedFields[key] = req.body[key];
     }
+  }
+
+  let sanitizedCoverLetter;
+
+  if (updatedFields.coverLetter) {
+    const window = new JSDOM("").window;
+    const DOMPurify = createDOMPurify(window);
+    sanitizedCoverLetter = DOMPurify.sanitize(updatedFields.coverLetter);
+    updatedFields.coverLetter = sanitizedCoverLetter;
   }
 
   const imageFile = req.file;

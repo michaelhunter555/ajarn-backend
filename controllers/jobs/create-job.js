@@ -4,6 +4,8 @@ const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const User = require("../../models/users");
 const Creator = require("../../models/creator");
+const { JSDOM } = require("jsdom");
+const createDOMPurify = require("dompurify");
 
 //job POST
 const createJob = async (req, res, next) => {
@@ -34,6 +36,10 @@ const createJob = async (req, res, next) => {
     creatorData,
     credits,
   } = req.body;
+
+  const window = new JSDOM("").window;
+  const DOMPurify = createDOMPurify(window);
+  const sanitizedDescription = DOMPurify.sanitize(description);
 
   //declare creator variable for Creator object
   let creator;
@@ -116,7 +122,7 @@ const createJob = async (req, res, next) => {
       "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZnJlZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60",
     salary,
     requirements,
-    description,
+    description: sanitizedDescription,
     hours,
     workPermit,
     jobType,
