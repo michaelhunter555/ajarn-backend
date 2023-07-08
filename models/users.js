@@ -12,6 +12,7 @@ const userSchema = new Schema({
   location: { type: String, default: "" },
   credits: { type: Number, default: 0 },
   education: { type: String, default: "" },
+  university: { type: String, default: "" },
   workExperience: { type: String, default: "" },
   coverLetter: { type: String, default: "" },
   resume: { type: [resumeSchema], default: [] },
