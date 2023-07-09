@@ -8,8 +8,7 @@ const getIncomeDirectoryInfo = async (req, res, next) => {
     incomeDirectoryData = await Income.find({}).populate({
       path: "userId",
       model: "Users",
-      select:
-        "_id postDate monthlySalary monthlySavings lifestyle perfectNumber jobTitle educationLevel",
+      select: "_id location userType",
     });
   } catch (err) {
     const error = new HttpError(

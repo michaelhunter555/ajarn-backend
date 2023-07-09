@@ -11,7 +11,7 @@ const getUserIncomePostById = async (req, res, next) => {
       path: "userId",
       Model: "Users",
       select:
-        " _id name nationality jobTitle lifestyle monthlySalary monthlySavings perfectNumber education postDate ",
+        " _id name nationality jobTitle lifestyle monthlySalary monthlySavings perfectNumber education postDate location",
     });
   } catch (err) {
     const error = new HttpError(
