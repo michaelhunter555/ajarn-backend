@@ -16,6 +16,8 @@ const updateComment = require("../controllers/blog/comments/update-comment");
 const getCommentsByPostId = require("../controllers/blog/comments/get-comments");
 const likeComment = require("../controllers/blog/comments/like-comment");
 const dislikeComment = require("../controllers/blog/comments/dislike-comment");
+const getCommentDislikesById = require("../controllers/blog/comments/get-comment-dislikes-by-id");
+const getCommentLikesById = require("../controllers/blog/comments/get-comment-likes-by-id");
 
 const { check } = require("express-validator");
 const checkAuth = require("../middleware/auth");
@@ -25,6 +27,12 @@ const { blogCategories } = require("../dummy_data/ThaiData");
 
 //get blog
 router.get("/", getAllBlogPosts); //all blog post
+
+//GET all comment Likes by blogId
+router.get("/post/comments/likes/:bid", getCommentLikesById);
+
+//GET all comment Dislikes by blogId
+router.get("/post/comments/dislikes:bid", getCommentDislikesById);
 
 //GET all comments by blogId
 router.get("/post/comments/:bid", getCommentsByPostId);

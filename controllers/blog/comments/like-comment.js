@@ -4,7 +4,7 @@ const User = require("../../../models/users");
 const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
-//PATCH - like comment post
+// PATCH - like comment post
 const likeComment = async (req, res, next) => {
   const userId = req.params.uid;
   const blogId = req.params.bid;
@@ -16,8 +16,8 @@ const likeComment = async (req, res, next) => {
     return next(error);
   }
 
-  //pass boolean and commentId in request body
-  const { commentLiked, commentId } = req.body;
+  // Pass boolean and commentId in request body
+  const { commentId } = req.body;
 
   let user;
 
@@ -56,31 +56,43 @@ const likeComment = async (req, res, next) => {
     return next(error);
   }
 
-  const commentIndex = blog.comments.findIndex(
-    (comment) => comment._id === commentId
-  );
-  const comment = blog.comments[commentIndex];
-
-  const userDislikedPostAlready = comment.interactions.some(
-    (interaction) =>
-      interaction.userId === user._id && interaction.dislike === true
+  // Find the comment
+  const comment = blog.comments.find((comment) =>
+    comment._id.equals(commentId)
   );
 
-  let userLikedComment;
+  if (!comment) {
+    const error = new HttpError(
+      "Could not find a comment by the given Id.",
+      404
+    );
+    return next(error);
+  }
 
-  if (userDislikedPostAlready) {
-    userLikedComment = {
-      userId: user._id,
-      postId: blogId,
-      like: !commentLiked,
-      dislike: false,
-    };
+  // Check if user already interacted with the comment
+  const userInteraction = comment.interactions.find((interaction) =>
+    interaction.userId.equals(user._id)
+  );
+
+  // If user interacted with the comment already
+  if (userInteraction) {
+    if (userInteraction.like) {
+      // User liked the comment already. So, remove the like.
+      const index = comment.interactions.indexOf(userInteraction);
+      comment.interactions.splice(index, 1);
+    } else {
+      // User disliked the comment. So, remove the dislike and add a like.
+      userInteraction.like = true;
+      userInteraction.dislike = false;
+    }
   } else {
-    userLikedComment = {
+    // User did not interact with the comment yet. So, add a like.
+    comment.interactions.push({
       userId: user._id,
       postId: blogId,
-      like: !commentLiked,
-    };
+      like: true,
+      dislike: false,
+    });
   }
 
   let sess;
@@ -88,7 +100,6 @@ const likeComment = async (req, res, next) => {
   try {
     sess = await mongoose.startSession();
     sess.startTransaction();
-    comment.interactions.push(userLikedComment);
     await blog.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
@@ -102,11 +113,13 @@ const likeComment = async (req, res, next) => {
       sess.endSession();
     }
   }
-  const totalCommentLikes = blog.interactions.filter(
-    (interaction) => interaction.like === true
+
+  // Sum of comment likes
+  const updatedLikes = comment.interactions.filter(
+    (action) => action.like
   ).length;
 
-  res.status(200).json({ commentLikes: totalCommentLikes });
+  res.status(200).json({ commentLikes: updatedLikes });
 };
 
 module.exports = likeComment;

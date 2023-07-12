@@ -4,7 +4,7 @@ const User = require("../../../models/users");
 const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
-//PATCH - like comment post
+//PATCH - disike comment post
 const dislikeComment = async (req, res, next) => {
   const userId = req.params.uid;
   const blogId = req.params.bid;
@@ -17,7 +17,7 @@ const dislikeComment = async (req, res, next) => {
   }
 
   //pass boolean and commentId in request body
-  const { commentDisliked, commentId } = req.body;
+  const { commentId } = req.body;
 
   let user;
 
@@ -56,36 +56,41 @@ const dislikeComment = async (req, res, next) => {
     return next(error);
   }
 
-  const commentIndex = blog.comments.findIndex(
-    (comment) => comment._id.toString() === commentId
+  //find the comment
+  const comment = blog.comments.find((comment) =>
+    comment._id.equals(commentId)
   );
 
-  if (commentIndex === -1) {
+  if (!comment) {
     const error = new HttpError("Could find a comment by the given Id.");
     return next(error);
   }
 
-  const comment = blog.comments[commentIndex];
-
-  const userLikedCommentAlready = comment.interactions.some(
-    (interaction) =>
-      interaction.userId === user._id && interaction.like === true
+  //if user interacted with the comment already
+  const userInteraction = comment.interactions.find((interaction) =>
+    interaction.userId.equals(user._id)
   );
 
-  let dislikedComment;
-  if (userLikedCommentAlready) {
-    dislikedComment = {
+  //check if user already interacted with comment
+  if (userInteraction) {
+    //if it was already a dislike
+    if (userInteraction.dislike) {
+      //find the index of that dislike and remove it
+      const index = comment.interactions.indexOf(userInteraction);
+      comment.interactions.splice(index, 1);
+    } else {
+      //User already liked comment. So, remove it.
+      userInteraction.dislike = true;
+      userInteraction.like = false;
+    }
+  } else {
+    //User has no interactions, so create a new one to add dislike.
+    comment.interactions.push({
       userId: user._id,
       postId: blogId,
       like: false,
-      dislike: !commentDisliked,
-    };
-  } else {
-    dislikedComment = {
-      userId: user._id,
-      postId: blogId,
-      dislike: !commentDisliked,
-    };
+      dislike: true,
+    });
   }
 
   let sess;
@@ -93,7 +98,6 @@ const dislikeComment = async (req, res, next) => {
   try {
     sess = await mongoose.startSession();
     sess.startTransaction();
-    comment.interactions.push(dislikedComment);
     await blog.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
@@ -107,8 +111,10 @@ const dislikeComment = async (req, res, next) => {
       sess.endSession();
     }
   }
+
+  //total sum of dislikes
   const totalCommentDislikes = comment.interactions.filter(
-    (interaction) => interaction.dislike === true
+    (action) => action.dislike
   ).length;
 
   res.status(200).json({ commentDislikes: totalCommentDislikes });
