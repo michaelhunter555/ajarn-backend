@@ -30,7 +30,7 @@ const applyToJobById = async (req, res, next) => {
   let job;
   //find our user by id and the job being applied to by id
   try {
-    user = await User.findById(userId);
+    user = await User.findById(userId).populate("applications");
     job = await Job.findById(jobId);
   } catch (err) {
     console.log(err);
@@ -50,14 +50,6 @@ const applyToJobById = async (req, res, next) => {
     throw new HttpError("Job not found", 404);
   }
 
-  //our Application Object takes userId, jobId, resume, coverLetter
-  const newApplication = new Application({
-    userId,
-    jobId,
-    resume: [user.resume],
-    coverLetter,
-  });
-
   //only teachers can apply to jobs, employers cannot
   if (user.userType !== "teacher") {
     const error = new HttpError("You must be a teacher to apply to jobs.", 403);
@@ -71,7 +63,7 @@ const applyToJobById = async (req, res, next) => {
   //check for any prior association with current job id within the last 30 days
   const userAppliedAlready = user.applications.some((application) => {
     //check for match by id
-    if (application.jobId === jobId) {
+    if (application.jobId.equals(job._id)) {
       //if there is a match create a new Date object and set it to application date
       const applicationDate = new Date(application.applicationDate);
       //simple subtraction
@@ -83,11 +75,19 @@ const applyToJobById = async (req, res, next) => {
     return false;
   });
 
+  //our Application Object takes userId, jobId, resume, coverLetter
+  const newApplication = new Application({
+    userId,
+    jobId,
+    resume: [user.resume],
+    coverLetter,
+  });
+
   //if true, throw an error because user has applied already.
   if (userAppliedAlready) {
     const error = new HttpError(
       `'You may only apply to a job once every 30 days'`,
-      404
+      401
     );
     return next(error);
   }

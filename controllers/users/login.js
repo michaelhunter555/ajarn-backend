@@ -21,7 +21,9 @@ const login = async (req, res, next) => {
 
   try {
     //try to find the user by email
-    identifiedUser = await User.findOne({ email: email });
+    identifiedUser = await User.findOne({ email: email }).populate(
+      "applications"
+    );
   } catch (err) {
     const error = new HttpError(
       "there was an error with the login request",
@@ -83,6 +85,8 @@ const login = async (req, res, next) => {
     coverLetter: identifiedUser.coverLetter,
     resume: identifiedUser.resume,
     incomeDirectory: identifiedUser.incomeDirectory,
+    applications: identifiedUser.applications,
+    jobs: identifiedUser.jobs,
   });
 };
 
