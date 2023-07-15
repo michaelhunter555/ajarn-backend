@@ -1,6 +1,8 @@
 const HttpError = require("../../models/http-error");
 const Blog = require("../../models/blog");
 const { validationResult } = require("express-validator");
+const createDOMPurify = require("dompurify");
+const { JSDOM } = require("jsdom");
 
 //PATCH
 const updateBlogPost = async (req, res, next) => {
@@ -44,11 +46,18 @@ const updateBlogPost = async (req, res, next) => {
     return next(error);
   }
 
-  const { updatedBlogPost } = req.body;
+  const { title, category, postContent } = req.body;
+
+  const window = new JSDOM("").window;
+  const DOMPurify = createDOMPurify(window);
+  const sanitizedPostContent = DOMPurify.sanitize(postContent);
 
   const newUpdatedBlogPost = {
     _id: blogId,
-    ...updatedBlogPost,
+    title: title,
+    category: category,
+    postContent: sanitizedPostContent,
+    editedAt: Date.now(),
   };
 
   let updatedPost;

@@ -32,6 +32,7 @@ const blogSchema = new Schema({
   interactions: { type: [postInteractions], required: false, default: [] },
   comments: { type: [comments], required: false, default: [] },
   category: { type: String, required: true, default: "general" },
+  editedAt: { type: Date },
 });
 
 module.exports = mongoose.model("Blogs", blogSchema);

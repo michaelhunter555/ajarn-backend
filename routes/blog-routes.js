@@ -93,11 +93,11 @@ router.patch(
   "/post/:bid",
   [
     check("title").not().isEmpty(),
-    check("categories").custom((val) => {
+    check("category").custom((val) => {
       const allowedCategories = [...blogCategories];
       return allowedCategories.includes(val);
     }),
-    check("PostContent").isLength({ min: 7 }),
+    check("postContent").isLength({ min: 7 }),
   ],
   checkAuth,
   updateBlogPostById

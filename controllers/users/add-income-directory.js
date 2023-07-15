@@ -39,7 +39,7 @@ const IncomeDirectoryContribution = async (req, res, next) => {
     await addContribution.save();
   } else {
     const error = new HttpError(
-      "The income directory is for teachers, not employers."
+      "The income directory is for teachers to share their salaries as a reference for others. Please do not try to contribute as an employer."
     );
     return next(error);
   }

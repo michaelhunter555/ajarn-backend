@@ -11,7 +11,9 @@ const getUserById = async (req, res, next) => {
 
   //try to find user and if they have a creator property
   try {
-    user = await User.findById(userId).populate("applications");
+    user = await User.findById(userId)
+      .populate("applications")
+      .populate("blogPosts");
   } catch (err) {
     //if issues with our call, return next error
     const error = new HttpError("There was an issue with the request", 500);
@@ -26,7 +28,9 @@ const getUserById = async (req, res, next) => {
 
   if (user.creator) {
     try {
-      user = await User.findById(userId, "-password").populate("creator");
+      user = await User.findById(userId, "-password")
+        .populate("creator")
+        .populate("blogPosts");
     } catch (err) {
       const error = new HttpError(
         "there was an error populating creator data",
