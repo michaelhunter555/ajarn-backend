@@ -8,9 +8,12 @@ const deleteBlogPostById = async (req, res, next) => {
 
   let blog;
 
+  console.log("BLOG ID IN REQ PARAMS", blogId);
+
   try {
     blog = await Blog.findById(blogId);
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "there was an issue with the request for deleting a blog post.",
       500
@@ -60,9 +63,7 @@ const deleteBlogPostById = async (req, res, next) => {
     }
   }
 
-  res
-    .status(200)
-    .json({ message: "deleted a blog post", blogPosts: user.blogPosts });
+  res.status(200).json({ ok: true, blogPosts: user.blogPosts });
 };
 
 module.exports = deleteBlogPostById;

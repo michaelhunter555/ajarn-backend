@@ -87,6 +87,7 @@ const login = async (req, res, next) => {
     incomeDirectory: identifiedUser.incomeDirectory,
     applications: identifiedUser.applications,
     jobs: identifiedUser.jobs,
+    blogPosts: identifiedUser.blogPosts,
   });
 };
 

@@ -30,7 +30,8 @@ const getUserById = async (req, res, next) => {
     try {
       user = await User.findById(userId, "-password")
         .populate("creator")
-        .populate("blogPosts");
+        .populate("blogPosts")
+        .populate("jobs");
     } catch (err) {
       const error = new HttpError(
         "there was an error populating creator data",
