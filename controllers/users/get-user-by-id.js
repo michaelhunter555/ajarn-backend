@@ -12,7 +12,19 @@ const getUserById = async (req, res, next) => {
   //try to find user and if they have a creator property
   try {
     user = await User.findById(userId)
-      .populate("applications")
+      .populate({
+        path: "applications",
+        model: "Application",
+        populate: {
+          path: "jobId",
+          model: "Jobs",
+          select: "_id title salary location hours",
+          populate: {
+            path: "creator",
+            model: "Creator",
+          },
+        },
+      })
       .populate("blogPosts");
   } catch (err) {
     //if issues with our call, return next error

@@ -23,6 +23,7 @@ const getJobsByUserId = async (req, res, next) => {
           populate: {
             path: "userId",
             model: "Users",
+            select: "-password",
           },
         },
       ],
