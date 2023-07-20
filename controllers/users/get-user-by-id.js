@@ -43,7 +43,19 @@ const getUserById = async (req, res, next) => {
       user = await User.findById(userId, "-password")
         .populate("creator")
         .populate("blogPosts")
-        .populate("jobs");
+        .populate({
+          path: "jobs",
+          model: "Jobs",
+          populate: {
+            path: "applicants",
+            model: "Application",
+            populate: {
+              path: "userId",
+              model: "Users",
+              select: "_id name email location nationality",
+            },
+          },
+        });
     } catch (err) {
       const error = new HttpError(
         "there was an error populating creator data",
