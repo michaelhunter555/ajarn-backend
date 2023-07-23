@@ -157,10 +157,40 @@ const updateUserProfile = async (req, res, next) => {
     //find our user and updatable fields.
     await User.findByIdAndUpdate(userId, updatedFields);
     //populate creator data for user
-    updatedUser = await User.findById(userId).populate({
-      path: "creator",
-      select: "-creator",
-    });
+    if (user.creator) {
+      updatedUser = await User.findById(userId)
+        .populate("creator")
+        .populate("blogPosts")
+        .populate({
+          path: "jobs",
+          model: "Jobs",
+          populate: {
+            path: "applicants",
+            model: "Application",
+            populate: {
+              path: "userId",
+              model: "Users",
+              select: "_id name email location nationality",
+            },
+          },
+        });
+    } else {
+      updatedUser = await User.findById(userId)
+        .populate({
+          path: "applications",
+          model: "Application",
+          populate: {
+            path: "jobId",
+            model: "Jobs",
+            select: "_id title salary location hours",
+            populate: {
+              path: "creator",
+              model: "Creator",
+            },
+          },
+        })
+        .populate("blogPosts");
+    }
   } catch (err) {
     console.log(err);
     //any issues with our request, return next error
