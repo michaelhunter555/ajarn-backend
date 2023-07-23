@@ -44,7 +44,21 @@ const updateVisibility = async (req, res, next) => {
   //update isHidden property
   try {
     await User.updateOne({ _id: userId }, { $set: { isHidden: isHidden } });
-    user = await User.findById(userId).populate("creator");
+    user = await User.findById(userId)
+      .populate({
+        path: "applications",
+        model: "Application",
+        populate: {
+          path: "jobId",
+          model: "Jobs",
+          select: "_id title salary location hours",
+          populate: {
+            path: "creator",
+            model: "Creator",
+          },
+        },
+      })
+      .populate("blogPosts");
   } catch (err) {
     //if our request is bad, return next error
     const error = new HttpError(

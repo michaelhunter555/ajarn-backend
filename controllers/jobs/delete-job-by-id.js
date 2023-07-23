@@ -27,8 +27,6 @@ const deleteJobById = async (req, res, next) => {
     return next(error);
   }
 
-  console.log("Job.Creator Here:", job.creator._id);
-
   //add authentication check here
   if (job.creator._id.toString() !== req.userData.userId) {
     const error = new HttpError(

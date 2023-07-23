@@ -19,8 +19,6 @@ const updateCreator = async (req, res, next) => {
 
   const { creator } = req.body;
 
-  console.log(creator);
-
   let user;
   try {
     user = await User.findById(userId).populate("creator");

@@ -61,7 +61,7 @@ const createJob = async (req, res, next) => {
       //get keys of creatorData object and check if the values are different.
       //if they are, update the creator fields.
       //set shoudUpdate to true if any fields are different
-      console.log(creatorData);
+
       Object.keys(creatorData).forEach((key) => {
         if (creatorData[key] !== creator[key]) {
           creator[key] = creatorData[key];
