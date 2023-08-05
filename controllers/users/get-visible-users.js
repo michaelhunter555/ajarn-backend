@@ -3,7 +3,6 @@ const User = require("../../models/users");
 
 //GET all users who consent to have their profile viewed.
 const getVisibleUsers = async (req, res, next) => {
-  //declare visible users variable
   let visibleUsers;
 
   //search for visible users - remove passwords from the result

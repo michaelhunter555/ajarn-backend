@@ -54,7 +54,7 @@ const createJob = async (req, res, next) => {
       creator = new Creator({
         //Creator id will take userId as a reference
         _id: userId,
-        //spread of create data
+        //copy of creator data
         ...creatorData,
       });
     } else {
@@ -80,7 +80,6 @@ const createJob = async (req, res, next) => {
     return next(error);
   }
 
-  //declare user variable
   let user;
 
   try {

@@ -3,7 +3,6 @@ const User = require("../../models/users");
 
 //GET all users
 const getUsers = async (req, res, next) => {
-  //declare user variable
   let user;
   // find all available users - remove password from result
   try {
