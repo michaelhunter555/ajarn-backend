@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
   name: { type: String, required: true },
+  stripeCustomerId: { type: String, required: false, default: "" },
   password: { type: String, required: true, minlength: 7 },
   email: { type: String, required: true, unique: true },
   image: { type: String, default: "" },
@@ -33,6 +34,9 @@ const userSchema = new Schema({
   jobs: [{ type: mongoose.Types.ObjectId, required: false, ref: "Jobs" }],
   createdJobs: [
     { type: mongoose.Types.ObjectId, required: false, ref: "Jobs" },
+  ],
+  billingData: [
+    { type: mongoose.Types.ObjectId, required: false, ref: "Billing" },
   ],
 });
 
