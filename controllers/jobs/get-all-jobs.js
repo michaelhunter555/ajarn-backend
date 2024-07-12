@@ -11,6 +11,7 @@ const getAllJobs = async (req, res, next) => {
   if (location) jobQuery.location = location;
   if (salary) jobQuery.salary = salary;
   if (hours) jobQuery.hours = hours;
+
   //declare jobs variable
   let jobs;
   //find all job objects
@@ -29,16 +30,12 @@ const getAllJobs = async (req, res, next) => {
       .sort({ datePosted: -1 });
 
     if (isHome === "false") {
-      jobsQuery
-        .sort({ datePosted: -1 })
-        .skip((pageNum - 1) * limitNum)
-        .limit(limitNum);
+      jobsQuery.skip((pageNum - 1) * limitNum).limit(limitNum);
     }
 
     jobs = await jobsQuery.exec();
 
     const totalJobs = await Job.countDocuments(jobQuery);
-
     res.json({
       jobs,
       currentPage: page,

@@ -22,6 +22,11 @@ const getApplicantsByCreator = async (req, res, next) => {
         model: "Users",
         select: "_id name email location nationality",
       })
+      .populate({
+        path: "jobId",
+        model: "Jobs",
+        select: "_id title location",
+      })
       .lean();
 
     // Step 3: Calculate total applicants and total pages

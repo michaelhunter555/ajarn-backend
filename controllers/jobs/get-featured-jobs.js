@@ -18,7 +18,8 @@ const getFeaturedJobs = async (req, res, next) => {
       .populate({
         path: "applicants",
         select: "applicationDate userId",
-      });
+      })
+      .sort({ datePosted: -1 });
 
     if (isHome === "true") {
       featureJobsQuery.skip(pageNum - 1).limit(limitNum);
