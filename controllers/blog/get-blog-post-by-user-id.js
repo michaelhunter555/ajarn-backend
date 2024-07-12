@@ -1,14 +1,19 @@
 const HttpError = require("../../models/http-error");
-const User = require("../../models/users");
+const Blog = require("../../models/blog");
 
 //GET
 const getBlogPostByUserId = async (req, res, next) => {
-  const userId = req.params.pid;
+  const userId = req.params.uid;
+  const { page, limit } = req.query;
+  const pageNum = parseInt(page, 10) || 1;
+  const limitNum = parseInt(limit, 10) || 5;
 
-  let user;
+  let blog;
 
   try {
-    user = await User.findById(userId);
+    blog = await Blog.find({ author: userId })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
   } catch (err) {
     const error = new HttpError(
       "There was an error with retrieving blog posts",
@@ -17,7 +22,7 @@ const getBlogPostByUserId = async (req, res, next) => {
     return next(error);
   }
 
-  if (!user) {
+  if (!blog) {
     const error = new HttpError(
       "There are currently no blog posts connected to this user Id",
       404
@@ -25,15 +30,10 @@ const getBlogPostByUserId = async (req, res, next) => {
     return next(error);
   }
 
-  if (user && user.blogPosts.length === 0) {
-    const error = new HttpError(
-      "There are currently no blog posts connected to this user Id",
-      404
-    );
-    return next(error);
-  }
+  const totalBlogPosts = await Blog.countDocuments({ author: userId });
+  const totalPages = Math.ceil(totalBlogPosts / limitNum);
 
-  res.status(200).json({ userPosts: user.blogPosts, ok: true });
+  res.status(200).json({ userPosts: blog, pageNum, totalPages, ok: true });
 };
 
 module.exports = getBlogPostByUserId;

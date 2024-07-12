@@ -5,6 +5,9 @@ const User = require("../../models/users");
 const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const transporter = require("../../middleware/nodemailer");
+const { uploadToCloudinary } = require("../../lib/cloudinaryHelper");
 
 //POST user sign-up
 const signup = async (req, res, next) => {
@@ -12,9 +15,11 @@ const signup = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
-    throw new HttpError(
-      "Please check check that your inputs match requirements and try again. Passwords must be at least 7 characters long and contain 1 number",
-      422
+    return next(
+      new HttpError(
+        "Please check check that your inputs match requirements and try again. Passwords must be at least 7 characters long and contain 1 number",
+        422
+      )
     );
   }
   //we expect name, email and password
@@ -49,14 +54,35 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  //create a random token from crypto
+  const verificationToken = crypto.randomBytes(32).toString("hex");
+
+  let imageUrl = null;
+
+  if (req.file) {
+    try {
+      const result = await uploadToCloudinary(req.file.buffer);
+      imageUrl = result.secure_url;
+    } catch (err) {
+      console.log(err);
+      const error = new HttpError(
+        "Could not upload image, please try again.",
+        500
+      );
+      return next(error);
+    }
+  }
+
   //create new instance of User object with required fields
   const createdUser = new User({
     name,
     email,
-    image: req.file.path,
+    image: imageUrl,
     password: encryptPassword,
     userType,
     isHidden: userType === "employer",
+    verificationToken,
+    isVerified: false,
   });
 
   //try to create user
@@ -68,6 +94,30 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  // //email verification link we will send to user.
+  // const verificationLink = `${process.env.CLIENT_PATH}/verify-email?token=${verificationToken}`;
+  // //our email
+  // const mailOptions = {
+  //   from: process.env.EMAIL_USER, //EMAIL_USER
+  //   to: email,
+  //   subject: "AjarnJobs.com - Verifiy your email address",
+  //   html: `<p>
+  //   Click Here to verify: <a href=${verificationLink}>Here</a> to verify your email
+  //   </p>`,
+  // };
+  // //send email with transporter helper
+  // transporter.sendMail(mailOptions, (error, info) => {
+  //   if (error) {
+  //     console.log(error);
+  //     const errors = new HttpError(
+  //       "Error with sending email verification.",
+  //       404
+  //     );
+  //     return next(errors);
+  //   }
+  //   console.log("Verification email sent: " + info.response);
+  // });
+
   let token;
   try {
     token = jwt.sign(
@@ -75,19 +125,19 @@ const signup = async (req, res, next) => {
       process.env.SECRET_WEB_TOKEN,
       { expiresIn: "1hr" }
     );
-  } catch (err) {
-    const error = new HttpError("signing up failed, please try again", 500);
-    return next(error);
-  }
-  //render json data of new user
-  res
-    .status(201)
-    .json({
+    //render json data of new user
+    res.status(201).json({
+      buffetIsActive: createdUser.buffetIsActive,
+      userType: createdUser.userType,
       userId: createdUser._id,
       email: createdUser.email,
       image: createdUser.image,
       token: token,
     });
+  } catch (err) {
+    const error = new HttpError("signing up failed, please try again", 500);
+    return next(error);
+  }
 };
 
 module.exports = signup;

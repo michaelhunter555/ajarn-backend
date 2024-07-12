@@ -1,5 +1,6 @@
 const HttpError = require("../../models/http-error");
 const Job = require("../../models/jobs");
+const UserBilling = require("../../models/billing");
 const { validationResult } = require("express-validator");
 const mongoose = require("mongoose");
 const User = require("../../models/users");
@@ -149,6 +150,14 @@ const createJob = async (req, res, next) => {
     await sess.commitTransaction();
     //populate creator information
     await createdJob.populate("creator");
+
+    const createJobTransaction = new UserBilling({
+      userId: userId,
+      purchaseDate: new Date(),
+      purchaseAmount: -credits * 100,
+      productName: `Created ${jobType} job (${credits})`,
+    });
+    await createJobTransaction.save();
   } catch (err) {
     console.log(err);
     const error = new HttpError("Creating job failed, please try again", 500);

@@ -1,9 +1,12 @@
 const HttpError = require("../../models/http-error");
 const User = require("../../models/users");
 const Creator = require("../../models/creator");
+const Jobs = require("../../models/jobs");
 const { validationResult } = require("express-validator");
 const { JSDOM } = require("jsdom");
+const { uploadToCloudinary } = require("../../lib/cloudinaryHelper");
 const createDOMPurify = require("dompurify");
+const cloudinary = require("cloudinary").v2;
 
 //PATCH update userProfile
 const updateUserProfile = async (req, res, next) => {
@@ -59,9 +62,22 @@ const updateUserProfile = async (req, res, next) => {
     updatedFields.coverLetter = sanitizedCoverLetter;
   }
 
-  const imageFile = req.file;
-  if (imageFile) {
-    updatedFields.image = req.file.path;
+  if (req.file) {
+    try {
+      const user = await User.findById(userId);
+      if (user && user.image.includes("cloudinary")) {
+        const imageId = user.image.split("/").pop().split(".")[0]; // Extract image ID from URL
+        await cloudinary.uploader.destroy(imageId); // Delete old image
+      }
+      const result = await uploadToCloudinary(req.file.buffer);
+      updatedFields.image = result.secure_url;
+    } catch (err) {
+      const error = new HttpError(
+        "Could not upload image, please try again.",
+        500
+      );
+      return next(error);
+    }
   }
   //console.log("request file:", req.file.path);
 
@@ -156,6 +172,17 @@ const updateUserProfile = async (req, res, next) => {
   try {
     //find our user and updatable fields.
     await User.findByIdAndUpdate(userId, updatedFields);
+
+    //update jobs & creator image if user updated their profile image
+    if (req.file && user.userType === "employer" && hasExistingCreator) {
+      await Jobs.updateMany(
+        { creator: user.creator._id },
+        { $set: { image: updatedFields.image } }
+      );
+      await Creator.findByIdAndUpdate(user.creator._id, {
+        image: updatedFields.image,
+      });
+    }
     //populate creator data for user
     if (user.creator) {
       updatedUser = await User.findById(userId)
@@ -191,6 +218,9 @@ const updateUserProfile = async (req, res, next) => {
         })
         .populate("blogPosts");
     }
+
+    //return updated user as json object
+    res.status(200).json({ ok: true, user: updatedUser });
   } catch (err) {
     console.log(err);
     //any issues with our request, return next error
@@ -202,9 +232,6 @@ const updateUserProfile = async (req, res, next) => {
   }
 
   // console.log(updatedUser.coverLetter);
-
-  //return updated user as json object
-  res.status(200).json({ ok: true, user: updatedUser });
 };
 
 module.exports = updateUserProfile;

@@ -15,6 +15,9 @@ const fileUpload = require("../middleware/file-upload");
 const IncomeDirectoryContribution = require("../controllers/users/add-income-directory");
 const getIncomeDirectoryInfo = require("../controllers/users/get-user-incomes");
 const getUserIncomePostById = require("../controllers/users/get-user-income-by-id");
+const getApplicantsByCreator = require("../controllers/users/get-applicants-by-creator");
+const verifyUserEmail = require("../controllers/users/verify-user-email");
+const getUserApplications = require("../controllers/users/get-user-applications");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -33,6 +36,14 @@ router.get("/income-posts", getIncomeDirectoryInfo);
 
 router.get("/income-posts/:id", getUserIncomePostById);
 
+//GET verify user email address
+router.get("/verify-email", verifyUserEmail);
+
+//GET user applications
+router.get("/get-applications/:userId", getUserApplications);
+
+//GET applicants by creatorId
+router.get("/applicants/:creatorId", getApplicantsByCreator);
 //GET find user by id
 router.get("/:uid", getUserById);
 

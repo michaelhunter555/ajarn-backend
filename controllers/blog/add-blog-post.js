@@ -9,8 +9,6 @@ const { JSDOM } = require("jsdom");
 const addNewBlogPost = async (req, res, next) => {
   const userId = req.params.uid;
 
-  console.log("userId", userId);
-
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log(errors);
@@ -22,8 +20,6 @@ const addNewBlogPost = async (req, res, next) => {
   }
 
   const { title, postContent, category } = req.body;
-
-  console.log("blog post data", title, postContent, category);
 
   const window = new JSDOM("").window;
   const DOMPurify = createDOMPurify(window);

@@ -88,6 +88,8 @@ const login = async (req, res, next) => {
     applications: identifiedUser.applications,
     jobs: identifiedUser.jobs,
     blogPosts: identifiedUser.blogPosts,
+    buffetStartDate: identifiedUser.buffetStartDate,
+    buffetEndDate: identifiedUser.buffetEndDate,
   });
 };
 

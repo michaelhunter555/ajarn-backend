@@ -66,15 +66,12 @@ const getUserById = async (req, res, next) => {
   }
 
   if (user.buffetIsActive === true) {
-    const lastActiveBuffet = user.lastActiveBuffet.getTime();
+    const buffetEndTime = new Date(Number(user.buffetEndDate));
     const currentTime = new Date();
-    const timeDifference = currentTime.getTime() - lastActiveBuffet;
-    const buffetDuration = 24 * 60 * 60 * 1000;
 
-    if (timeDifference > buffetDuration) {
+    if (currentTime > buffetEndTime) {
       try {
         user.buffetIsActive = false;
-        await user.save();
       } catch (err) {
         const error = new HttpError(
           "Error updating user buffet activities.",
@@ -83,6 +80,13 @@ const getUserById = async (req, res, next) => {
         return next(error);
       }
     }
+
+    if (!user.buffetEndDate) {
+      user.buffetIsActive = false;
+      user.buffetStartDate = new Date();
+      user.buffetEndDate = new Date();
+    }
+    await user.save();
   }
 
   //json object of user data

@@ -8,7 +8,9 @@ const createJob = require("../controllers/jobs/create-job");
 const updateJobById = require("../controllers/jobs/update-job");
 const deleteJobById = require("../controllers/jobs/delete-job-by-id");
 const activateBuffet = require("../controllers/jobs/activate-teacher-buffet");
-
+const getJobsByCreatorId = require("../controllers/jobs/get-jobs-by-creator-id");
+const getJobListings = require("../controllers/jobs/get-job-listings");
+const getFeaturedJobs = require("../controllers/jobs/get-featured-jobs");
 const { check } = require("express-validator");
 
 const {
@@ -20,7 +22,12 @@ const {
 
 //Get all jobs
 router.get("/", getAllJobs);
-
+//GET featured Jobs
+router.get("/featured-jobs", getFeaturedJobs);
+//GetJobListings
+router.get("/job-listings/:creatorId", getJobListings);
+//GET jobs by creatorId
+router.get("/creator/:creatorId", getJobsByCreatorId);
 //GET job by userId
 router.get("/user/:uid", getJobsByUserId);
 
