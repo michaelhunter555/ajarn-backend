@@ -43,6 +43,7 @@ const getJobsByUserId = async (req, res, next) => {
     );
     return next(error);
   }
+
   //res jobs by userId
   res.json({ jobs: user.jobs });
 };

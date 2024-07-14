@@ -9,6 +9,7 @@ const getUserApplications = async (req, res) => {
 
   try {
     const applications = await Applications.find({ userId })
+      .sort({ applicationDate: -1 })
       .skip((pageNum - 1) * limit)
       .limit(limitNum)
       .populate({

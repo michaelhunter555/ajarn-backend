@@ -25,7 +25,8 @@ const getUserById = async (req, res, next) => {
           },
         },
       })
-      .populate("blogPosts");
+      .populate("blogPosts")
+      .populate("recruitmentReceived");
   } catch (err) {
     //if issues with our call, return next error
     const error = new HttpError("There was an issue with the request", 500);
@@ -43,6 +44,7 @@ const getUserById = async (req, res, next) => {
       user = await User.findById(userId, "-password")
         .populate("creator")
         .populate("blogPosts")
+        .populate("recruitmentSent")
         .populate({
           path: "jobs",
           model: "Jobs",

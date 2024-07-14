@@ -11,6 +11,7 @@ const activateBuffet = require("../controllers/jobs/activate-teacher-buffet");
 const getJobsByCreatorId = require("../controllers/jobs/get-jobs-by-creator-id");
 const getJobListings = require("../controllers/jobs/get-job-listings");
 const getFeaturedJobs = require("../controllers/jobs/get-featured-jobs");
+const recruitTeacher = require("../controllers/jobs/recruit-teacher");
 const { check } = require("express-validator");
 
 const {
@@ -38,6 +39,8 @@ router.get("/:jid", getJobById);
 router.use(checkAuth);
 
 //POST job
+
+router.post("/recruit-teacher", recruitTeacher);
 router.post(
   "/create-job/:uid",
   //job validation logic

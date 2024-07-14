@@ -1,4 +1,5 @@
 const express = require("express");
+const checkAuth = require("../middleware/auth");
 const router = express.Router();
 const getUsers = require("../controllers/users/get-users");
 const getVisibleUsers = require("../controllers/users/get-visible-users");
@@ -18,6 +19,8 @@ const getUserIncomePostById = require("../controllers/users/get-user-income-by-i
 const getApplicantsByCreator = require("../controllers/users/get-applicants-by-creator");
 const verifyUserEmail = require("../controllers/users/verify-user-email");
 const getUserApplications = require("../controllers/users/get-user-applications");
+const recruitmentResponse = require("../controllers/users/respond-to-recruitment");
+const getUserRecruitments = require("../controllers/users/get-user-recruitments");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -37,13 +40,8 @@ router.get("/income-posts", getIncomeDirectoryInfo);
 router.get("/income-posts/:id", getUserIncomePostById);
 
 //GET verify user email address
-router.get("/verify-email", verifyUserEmail);
+router.get("/verify-email", verifyUserEmail); // should be a post?
 
-//GET user applications
-router.get("/get-applications/:userId", getUserApplications);
-
-//GET applicants by creatorId
-router.get("/applicants/:creatorId", getApplicantsByCreator);
 //GET find user by id
 router.get("/:uid", getUserById);
 
@@ -70,9 +68,20 @@ router.post(
 );
 
 //***check Authentication***
-//router.use(checkAuth);
+router.use(checkAuth);
+
+//GET user applications
+router.get("/get-applications/:userId", getUserApplications);
+
+//GET applicants by creatorId
+router.get("/applicants/:creatorId", getApplicantsByCreator);
+
+//GET user recruitment Offers (if any)
+router.get("/get-recruitment-offers/:userId", getUserRecruitments);
 
 /* CLOSED POST ROUTE */
+//POST
+router.post("/recruitment-offfer-response/:userId", recruitmentResponse);
 //POST
 router.post("/income-directory/:uid", IncomeDirectoryContribution);
 
@@ -82,16 +91,16 @@ router.post("/:uid/apply/:jid", applyToJobById);
 /* PATCH ROUTES */
 
 //PATCH update profile visiblity
-router.patch("/update-visibility/:uid", updateVisibility);
+router.patch("/update-visibility/:uid", updateVisibility); //toggle-visibility
 
 //PATCH update userRole (userType)
-router.patch("/update-role/:uid", updateUserRole);
+router.patch("/update-role/:uid", updateUserRole); //deprecated
 
 //PATCH update creator profile
-router.patch("/update-creator/:uid", updateCreator);
+router.patch("/update-creator/:uid", updateCreator); //deprecated - use update profile
 
 //PATCH add credits
-router.patch("/:uid/add-credits", addCredits);
+router.patch("/:uid/add-credits", addCredits); //deprecated
 
 //PATCH update Profile
 router.patch(

@@ -43,6 +43,12 @@ const userSchema = new Schema({
   billingData: [
     { type: mongoose.Types.ObjectId, required: false, ref: "Billing" },
   ],
+  recruitmentSent: [
+    { type: mongoose.Types.ObjectId, required: false, ref: "Recruitment" },
+  ],
+  recruitmentReceived: [
+    { type: mongoose.Types.ObjectId, required: false, ref: "Recruitment" }, //"Recruitment"
+  ],
 });
 
 userSchema.plugin(uniqueValidator);
