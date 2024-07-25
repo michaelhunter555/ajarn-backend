@@ -67,7 +67,7 @@ const login = async (req, res, next) => {
         userType: identifiedUser.userType,
       },
       process.env.SECRET_WEB_TOKEN,
-      { expiresIn: "1hr" }
+      { expiresIn: "10h" }
     );
   } catch (err) {
     const error = new HttpError("login failed, please try again", 500);
@@ -90,6 +90,7 @@ const login = async (req, res, next) => {
     blogPosts: identifiedUser.blogPosts,
     buffetStartDate: identifiedUser.buffetStartDate,
     buffetEndDate: identifiedUser.buffetEndDate,
+    theme: identifiedUser.theme,
   });
 };
 

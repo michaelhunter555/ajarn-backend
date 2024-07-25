@@ -16,6 +16,7 @@ const jobsSchema = new Schema({
   applicants: [
     { type: mongoose.Types.ObjectId, required: false, ref: "Application" },
   ],
+  views: { type: Number, required: false, default: 0 },
 });
 
 module.exports = mongoose.model("Jobs", jobsSchema);

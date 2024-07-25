@@ -21,6 +21,11 @@ const verifyUserEmail = require("../controllers/users/verify-user-email");
 const getUserApplications = require("../controllers/users/get-user-applications");
 const recruitmentResponse = require("../controllers/users/respond-to-recruitment");
 const getUserRecruitments = require("../controllers/users/get-user-recruitments");
+const getEmployerRecruits = require("../controllers/users/get-employer-recruitments");
+const removeApplicantsById = require("../controllers/users/remove-applicants-by-id");
+const removeRecruitById = require("../controllers/users/remove-recruits-by-id");
+const removeApplicationFromJob = require("../controllers/users/remove-application-from-job");
+const toggleUserTheme = require("../controllers/users/toggle-theme");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -73,6 +78,8 @@ router.use(checkAuth);
 //GET user applications
 router.get("/get-applications/:userId", getUserApplications);
 
+//GET Employer Recruits
+router.get("/get-employer-recruits/:creatorId", getEmployerRecruits);
 //GET applicants by creatorId
 router.get("/applicants/:creatorId", getApplicantsByCreator);
 
@@ -80,6 +87,7 @@ router.get("/applicants/:creatorId", getApplicantsByCreator);
 router.get("/get-recruitment-offers/:userId", getUserRecruitments);
 
 /* CLOSED POST ROUTE */
+router.post("/toggle-theme/:userId", toggleUserTheme);
 //POST
 router.post("/recruitment-offfer-response/:userId", recruitmentResponse);
 //POST
@@ -108,5 +116,8 @@ router.patch(
   fileUpload.single("image"),
   updateUserProfile
 );
+router.delete("/remove-application-from-job/:userId", removeApplicationFromJob);
+router.delete("/remove-applicants", removeApplicantsById);
+router.delete("/remove-recruits-by-id", removeRecruitById);
 
 module.exports = router;

@@ -83,6 +83,7 @@ const signup = async (req, res, next) => {
     isHidden: userType === "employer",
     verificationToken,
     isVerified: false,
+    credits: 15, //temporary for new creators
   });
 
   //try to create user
@@ -123,7 +124,7 @@ const signup = async (req, res, next) => {
     token = jwt.sign(
       { userId: createdUser._id, email: createdUser.email },
       process.env.SECRET_WEB_TOKEN,
-      { expiresIn: "1hr" }
+      { expiresIn: "10h" }
     );
     //render json data of new user
     res.status(201).json({
@@ -131,6 +132,7 @@ const signup = async (req, res, next) => {
       userType: createdUser.userType,
       userId: createdUser._id,
       email: createdUser.email,
+      theme: createdUser.theme,
       image: createdUser.image,
       token: token,
     });

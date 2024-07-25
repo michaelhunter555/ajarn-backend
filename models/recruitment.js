@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const recruitmentSchema = new Schema({
   teacherId: { type: mongoose.Types.ObjectId, required: true, ref: "Users" },
   creatorId: { type: mongoose.Types.ObjectId, required: true, ref: "Creator" },
-  jobId: { type: String, required: true, ref: "Creator" },
+  jobId: { type: String, required: true, ref: "Jobs" },
   jobTitle: { type: String, required: true },
   location: { type: String, required: true },
   salary: { type: String, required: true },

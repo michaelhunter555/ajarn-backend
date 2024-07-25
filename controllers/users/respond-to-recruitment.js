@@ -3,14 +3,15 @@ const User = require("../../models/users");
 
 const recruitmentResponse = async (req, res, next) => {
   const userId = req.params.userId;
-  const { recruitmentResponse, jobId } = req.body;
+  const { recruitmentResponse, recruitmentId } = req.body;
 
   try {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const recruitOffer = await Recruitment.findOne({ jobId });
+    //maybe job id is not enough
+    const recruitOffer = await Recruitment.findById(recruitmentId);
     if (!recruitOffer) {
       return res.status(404).json({ message: "Recruitment offer not found" });
     }
@@ -18,16 +19,17 @@ const recruitmentResponse = async (req, res, next) => {
     if (recruitmentResponse.declineReason) {
       recruitOffer.declineReason = recruitmentResponse.declineReason;
     }
-    recruitOffer.repsonse = recruitmentResponse.response;
+    recruitOffer.response = recruitmentResponse;
 
     await recruitOffer.save();
+    res
+      .status(200)
+      .json({ message: "Updated recruitment status successful", ok: true });
   } catch (err) {
     console.log(err);
-    res
-      .status(500)
-      .json({
-        message: "Failed to update recruitment response for user: " + err,
-      });
+    res.status(500).json({
+      message: "Failed to update recruitment response for user: " + err,
+    });
   }
 };
 

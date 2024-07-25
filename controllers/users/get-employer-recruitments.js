@@ -1,20 +1,25 @@
 const Recruitment = require("../../models/recruitment");
 
-//GET recruitment offers for Teachers to response to
-const getUserRecruitments = async (req, res, next) => {
+//GET recruitment offered by Employers to view status
+const getEmployerRecruits = async (req, res, next) => {
   const { page, limit } = req.query;
   const pageNum = parseInt(page, 10) || 1;
   const limitNum = parseInt(limit, 10) || 5;
-  const userId = req.params.userId;
+  const userId = req.params.creatorId;
 
   try {
-    const recruitmentOffers = await Recruitment.find({ teacherId: userId })
+    const recruitmentOffers = await Recruitment.find({ creatorId: userId })
+      .populate({
+        path: "teacherId",
+        Model: "Users",
+        select: "_id name recruitmentReceived location nationality",
+      })
       .sort({ datePosted: -1 })
-      .skip(pageNum - 1)
+      .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
 
     const totalRecruitmentOffers = await Recruitment.countDocuments({
-      teacherId: userId,
+      creatorId: userId,
     });
     const totalPages = Math.ceil(totalRecruitmentOffers / limitNum);
 
@@ -33,4 +38,4 @@ const getUserRecruitments = async (req, res, next) => {
   }
 };
 
-module.exports = getUserRecruitments;
+module.exports = getEmployerRecruits;

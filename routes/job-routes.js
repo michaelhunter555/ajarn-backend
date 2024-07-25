@@ -12,6 +12,7 @@ const getJobsByCreatorId = require("../controllers/jobs/get-jobs-by-creator-id")
 const getJobListings = require("../controllers/jobs/get-job-listings");
 const getFeaturedJobs = require("../controllers/jobs/get-featured-jobs");
 const recruitTeacher = require("../controllers/jobs/recruit-teacher");
+const bulkDeleteJobsById = require("../controllers/jobs/bulk-delete-jobs-by-id");
 const { check } = require("express-validator");
 
 const {
@@ -84,7 +85,8 @@ router.patch(
 //activate teacher buffet
 router.patch("/activate-buffet/:uid", activateBuffet);
 
+router.delete("/bulk-job-delete", bulkDeleteJobsById);
 //delete jobById
-router.delete("/:jid", deleteJobById);
+router.delete("/delete-job/:jid", deleteJobById);
 
 module.exports = router;

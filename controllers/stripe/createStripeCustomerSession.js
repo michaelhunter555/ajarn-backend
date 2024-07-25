@@ -12,6 +12,10 @@ const createStripeCheckout = async (req, res, next) => {
     return res.status(404).json({ message: "User not found" });
   }
 
+  const agency = "price_1PNxLvRpnv4ckgZhMFUfhKqZ";
+  const enterprise = "price_1PNxMiRpnv4ckgZhTjkWZrsD";
+  const canDiscount = priceId === agency || priceId === enterprise;
+
   let customer;
 
   if (!user.stripeCustomerId) {
@@ -36,6 +40,15 @@ const createStripeCheckout = async (req, res, next) => {
           userId: user?._id.toString(),
           credits: credits,
         },
+        ...(canDiscount
+          ? {
+              discounts: [
+                {
+                  coupon: "u8IMpn21",
+                },
+              ],
+            }
+          : {}),
       });
 
       res.status(200).json({

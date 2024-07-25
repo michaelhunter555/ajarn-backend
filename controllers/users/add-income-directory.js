@@ -11,6 +11,7 @@ const IncomeDirectoryContribution = async (req, res, next) => {
   try {
     user = await User.findById(userId);
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "There was an issue with the request to find user by Id.",
       500
@@ -39,7 +40,7 @@ const IncomeDirectoryContribution = async (req, res, next) => {
     await addContribution.save();
   } else {
     const error = new HttpError(
-      "The income directory is for teachers to share their salaries as a reference for others. Please do not try to contribute as an employer."
+      "Either you've posted already or you are an employer. Please do not attempt to post again."
     );
     return next(error);
   }
@@ -54,6 +55,7 @@ const IncomeDirectoryContribution = async (req, res, next) => {
     await user.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "There was an error with the transaction.",
       500

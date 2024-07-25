@@ -8,8 +8,6 @@ const deleteBlogPostById = async (req, res, next) => {
 
   let blog;
 
-  console.log("BLOG ID IN REQ PARAMS", blogId);
-
   try {
     blog = await Blog.findById(blogId);
   } catch (err) {

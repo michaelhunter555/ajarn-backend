@@ -97,11 +97,13 @@ const updateUserProfile = async (req, res, next) => {
   //if user updates the email field, we make sure the email doesn't already exist.
   if (updatedFields.email) {
     //try to see if the email exists
+    console.log("Checked the email");
     try {
       //create existingUser variable and try to find email
       const existingUser = await User.findOne({ email: updatedFields.email });
       //if the user exists and the id does not match the userId, return next error
-      if (existingUser && existingUser.id !== userId) {
+      if (existingUser && existingUser._id.toString() !== userId) {
+        console.log("User exists error thrown");
         const error = new HttpError(
           "This email already exists, please try again",
           400
@@ -110,6 +112,7 @@ const updateUserProfile = async (req, res, next) => {
       }
     } catch (err) {
       //catch if bad request and return next error
+      console.log(err);
       const error = new HttpError(
         "There was an issue with sending the request",
         500

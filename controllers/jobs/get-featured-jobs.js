@@ -22,7 +22,7 @@ const getFeaturedJobs = async (req, res, next) => {
       .sort({ datePosted: -1 });
 
     if (isHome === "true") {
-      featureJobsQuery.skip(pageNum - 1).limit(limitNum);
+      featureJobsQuery.skip((pageNum - 1) * limitNum).limit(limitNum);
     }
     jobs = await featureJobsQuery.exec();
     const totalJobs = await Jobs.countDocuments({ jobType: "featured" });

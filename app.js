@@ -8,7 +8,9 @@ const jobRoutes = require("./routes/job-routes");
 const userRoutes = require("./routes/user-routes");
 const blogRoutes = require("./routes/blog-routes");
 const stripeRoutes = require("./routes/stripe-routes");
+const checkJobExpiration = require("./controllers/jobs/check-job-expiration");
 const HttpError = require("./models/http-error");
+const cron = require("node-cron");
 const app = express();
 
 app.use((req, res, next) => {
@@ -47,6 +49,11 @@ app.use((error, req, res, next) => {
 
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occured." });
+});
+
+cron.schedule("0 0 * * *", () => {
+  console.log("midnight job ran.");
+  checkJobExpiration();
 });
 
 mongoose

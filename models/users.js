@@ -49,6 +49,7 @@ const userSchema = new Schema({
   recruitmentReceived: [
     { type: mongoose.Types.ObjectId, required: false, ref: "Recruitment" }, //"Recruitment"
   ],
+  views: { type: Number, required: false, default: 0 },
 });
 
 userSchema.plugin(uniqueValidator);

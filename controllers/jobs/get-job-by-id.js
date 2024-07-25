@@ -24,6 +24,11 @@ const getJobById = async (req, res, next) => {
           select: "name email resume",
         },
       });
+
+    if (job) {
+      job.views = job.views += 1;
+      await job.save();
+    }
   } catch (err) {
     console.log(err);
     // if error with request, return next error

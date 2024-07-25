@@ -22,6 +22,7 @@ const getUsers = async (req, res, next) => {
   try {
     //get all users excluding their password
     user = await User.find(searchProperty, "-password")
+      .sort({ _id: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
 

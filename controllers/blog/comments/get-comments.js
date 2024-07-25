@@ -11,7 +11,8 @@ const getCommentsByPostId = async (req, res, next) => {
     blog = await Blog.findById(blogId).populate({
       path: "comments.userId",
       model: "Users",
-      select: "_id name workExperience userType image",
+      select:
+        "_id name workExperience userType image location highestCertification nationality",
     });
   } catch (err) {
     console.log(err);

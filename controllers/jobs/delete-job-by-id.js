@@ -1,4 +1,3 @@
-const fs = require("fs");
 const HttpError = require("../../models/http-error");
 const Job = require("../../models/jobs");
 const mongoose = require("mongoose");
@@ -35,8 +34,7 @@ const deleteJobById = async (req, res, next) => {
     );
     return next(error);
   }
-
-  // const imagePath = job.image;
+  //delete image from cloudinary
 
   let sess;
   let user;
@@ -64,10 +62,6 @@ const deleteJobById = async (req, res, next) => {
       sess.endSession();
     }
   }
-
-  // fs.unlink(imagePath, (err) => {
-  //   console.log(err);
-  // });
 
   //confirm job is deleted message
   res.status(200).json({ message: "deleted a job", jobs: user.jobs });
