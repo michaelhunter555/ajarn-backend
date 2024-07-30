@@ -91,6 +91,7 @@ const login = async (req, res, next) => {
     buffetStartDate: identifiedUser.buffetStartDate,
     buffetEndDate: identifiedUser.buffetEndDate,
     theme: identifiedUser.theme,
+    name: identifiedUser.name,
   });
 };
 

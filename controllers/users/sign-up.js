@@ -135,6 +135,7 @@ const signup = async (req, res, next) => {
       theme: createdUser.theme,
       image: createdUser.image,
       token: token,
+      name: createdUser.name,
     });
   } catch (err) {
     const error = new HttpError("signing up failed, please try again", 500);

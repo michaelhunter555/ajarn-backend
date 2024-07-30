@@ -13,6 +13,7 @@ const getJobListings = require("../controllers/jobs/get-job-listings");
 const getFeaturedJobs = require("../controllers/jobs/get-featured-jobs");
 const recruitTeacher = require("../controllers/jobs/recruit-teacher");
 const bulkDeleteJobsById = require("../controllers/jobs/bulk-delete-jobs-by-id");
+const reportJobViolation = require("../controllers/jobs/report-job-violation");
 const { check } = require("express-validator");
 
 const {
@@ -42,6 +43,7 @@ router.use(checkAuth);
 //POST job
 
 router.post("/recruit-teacher", recruitTeacher);
+router.post("/job-post-violation", reportJobViolation);
 router.post(
   "/create-job/:uid",
   //job validation logic

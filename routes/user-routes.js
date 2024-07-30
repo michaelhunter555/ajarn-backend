@@ -26,6 +26,7 @@ const removeApplicantsById = require("../controllers/users/remove-applicants-by-
 const removeRecruitById = require("../controllers/users/remove-recruits-by-id");
 const removeApplicationFromJob = require("../controllers/users/remove-application-from-job");
 const toggleUserTheme = require("../controllers/users/toggle-theme");
+const postUserFeedback = require("../controllers/users/user-feedback");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -87,6 +88,8 @@ router.get("/applicants/:creatorId", getApplicantsByCreator);
 router.get("/get-recruitment-offers/:userId", getUserRecruitments);
 
 /* CLOSED POST ROUTE */
+
+router.post("/user-feedback/:userId", postUserFeedback);
 router.post("/toggle-theme/:userId", toggleUserTheme);
 //POST
 router.post("/recruitment-offfer-response/:userId", recruitmentResponse);
