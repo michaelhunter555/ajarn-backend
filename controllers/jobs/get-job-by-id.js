@@ -8,6 +8,7 @@ const getJobById = async (req, res, next) => {
 
   //declare job variable
   let job;
+  let otherJobs = [];
 
   //try finding job by Id
   try {
@@ -24,6 +25,20 @@ const getJobById = async (req, res, next) => {
           select: "name email resume",
         },
       });
+
+    // Only fetch other jobs if the main job exists
+    if (job && job.creator) {
+      // Fetch other jobs from the same creator, excluding the current job
+      // Don't populate applicants for other jobs to improve performance
+      otherJobs = await Job.find({ 
+        creator: job.creator._id,
+        _id: { $ne: jobId } // Exclude current job
+      })
+      .populate("creator", "company logoUrl") // Only populate basic creator info
+      .select("-applicants") // Exclude applicants to improve performance
+      .limit(5) // Limit to 5 other jobs to avoid overwhelming the response
+      .sort({ datePosted: -1 }); // Show most recent jobs first
+    }
 
     if (job) {
       job.views = job.views += 1;
@@ -50,7 +65,12 @@ const getJobById = async (req, res, next) => {
   }
 
   //res job object
-  res.json({ job: job.toObject({ getters: true }) });
+  res.json({ 
+    job: job.toObject({ getters: true }), 
+    otherJobs: otherJobs.map(job => job.toObject({ getters: true })),
+    otherJobsCount: otherJobs.length,
+    ok: true 
+  });
 };
 
 module.exports = getJobById;

@@ -18,6 +18,10 @@ const getIncomeDirectoryInfo = require("../controllers/users/get-user-incomes");
 const getUserIncomePostById = require("../controllers/users/get-user-income-by-id");
 const getApplicantsByCreator = require("../controllers/users/get-applicants-by-creator");
 const verifyUserEmail = require("../controllers/users/verify-user-email");
+const { googleAuth } = require("../controllers/users/google-auth");
+const completeOnboarding = require("../controllers/users/complete-onboarding");
+const firebaseSignup = require("../controllers/users/firebase-signup");
+const generateTempToken = require("../controllers/users/generate-temp-token");
 const getUserApplications = require("../controllers/users/get-user-applications");
 const recruitmentResponse = require("../controllers/users/respond-to-recruitment");
 const getUserRecruitments = require("../controllers/users/get-user-recruitments");
@@ -27,6 +31,7 @@ const removeRecruitById = require("../controllers/users/remove-recruits-by-id");
 const removeApplicationFromJob = require("../controllers/users/remove-application-from-job");
 const toggleUserTheme = require("../controllers/users/toggle-theme");
 const postUserFeedback = require("../controllers/users/user-feedback");
+const deleteUserById = require("../controllers/users/delete-user-by-id");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -69,12 +74,24 @@ router.post(
 //POST login
 router.post(
   "/login",
-  [check("email").isEmail(), check("password").not().isEmpty()],
+  [check("email").isEmail()],
   login
 );
 
+//POST Google OAuth
+router.post("/google-auth", googleAuth);
+
+//POST Firebase Signup (after email verification)
+router.post("/firebase-signup", firebaseSignup);
+
+//POST Generate temporary JWT token for Firebase-verified users
+router.post("/generate-temp-token", generateTempToken);
+
 //***check Authentication***
 router.use(checkAuth);
+
+//POST complete onboarding (protected route)
+router.post("/complete-onboarding/:uid", fileUpload.single("image"), completeOnboarding);
 
 //GET user applications
 router.get("/get-applications/:userId", getUserApplications);
@@ -122,5 +139,6 @@ router.patch(
 router.delete("/remove-application-from-job/:userId", removeApplicationFromJob);
 router.delete("/remove-applicants", removeApplicantsById);
 router.delete("/remove-recruits-by-id", removeRecruitById);
+router.delete("/delete-user-by-id", deleteUserById);
 
 module.exports = router;

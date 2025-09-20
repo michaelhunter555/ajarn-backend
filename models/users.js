@@ -6,8 +6,11 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   name: { type: String, required: true },
   stripeCustomerId: { type: String, required: false, default: "" },
-  password: { type: String, required: true, minlength: 7 },
+  password: { type: String, required: false, minlength: 7 }, // Made optional for OAuth users
   email: { type: String, required: true, unique: true },
+  googleId: { type: String, required: false, unique: true, sparse: true }, // For Google OAuth
+  firebaseUid: { type: String, required: false, unique: true, sparse: true }, // For Firebase Auth
+  isOnboarded: { type: Boolean, default: false }, // Track onboarding status
   image: { type: String, default: "" },
   theme: { type: String, default: "light" },
   verificationToken: { type: String },
