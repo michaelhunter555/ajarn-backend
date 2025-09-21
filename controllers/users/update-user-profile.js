@@ -62,18 +62,50 @@ const updateUserProfile = async (req, res, next) => {
     updatedFields.coverLetter = sanitizedCoverLetter;
   }
 
-  if (req.file) {
+  if (req.files && req.files.image) {
     try {
       const user = await User.findById(userId);
       if (user && user.image.includes("cloudinary")) {
         const imageId = user.image.split("/").pop().split(".")[0]; // Extract image ID from URL
         await cloudinary.uploader.destroy(imageId); // Delete old image
       }
-      const result = await uploadToCloudinary(req.file.buffer);
+      const imageFile = req.files.image[0];
+      const result = await uploadToCloudinary(imageFile.buffer);
       updatedFields.image = result.secure_url;
+      console.log("result", result);
+      console.log("image", updatedFields.image);
     } catch (err) {
+      console.log("err", err);
       const error = new HttpError(
         "Could not upload image, please try again.",
+        500
+      );
+      return next(error);
+    }
+  }
+
+  // Handle PDF resume upload
+  if (req.files && req.files.pdfResume) {
+    try {
+      const pdfFile = req.files.pdfResume[0]; // Get first file from array
+      const result = await uploadToCloudinary(pdfFile.buffer, {
+        resource_type: 'raw',
+        folder: 'resumes'
+      });
+      
+      // Delete old PDF if it exists
+      const user = await User.findById(userId);
+      if (user && user.pdfResume && user.pdfResume.includes("cloudinary")) {
+        const pdfId = user.pdfResume.split("/").pop();
+        await cloudinary.uploader.destroy(pdfId, { resource_type: 'raw' });
+      }
+      
+      // Update user with new PDF resume URL
+      updatedFields.pdfResume = result.secure_url;
+    } catch (err) {
+      console.error("PDF upload error:", err);
+      const error = new HttpError(
+        "Could not upload PDF resume, please try again.",
         500
       );
       return next(error);
@@ -94,32 +126,6 @@ const updateUserProfile = async (req, res, next) => {
     updatedFields.creator = null;
   }
 
-  //if user updates the email field, we make sure the email doesn't already exist.
-  if (updatedFields.email) {
-    //try to see if the email exists
-    console.log("Checked the email");
-    try {
-      //create existingUser variable and try to find email
-      const existingUser = await User.findOne({ email: updatedFields.email });
-      //if the user exists and the id does not match the userId, return next error
-      if (existingUser && existingUser._id.toString() !== userId) {
-        console.log("User exists error thrown");
-        const error = new HttpError(
-          "This email already exists, please try again",
-          400
-        );
-        return next(error);
-      }
-    } catch (err) {
-      //catch if bad request and return next error
-      console.log(err);
-      const error = new HttpError(
-        "There was an issue with sending the request",
-        500
-      );
-      return next(error);
-    }
-  }
 
   //for adding creator property
   const user = await User.findById(userId);

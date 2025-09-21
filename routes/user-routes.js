@@ -125,7 +125,7 @@ router.patch("/update-visibility/:uid", updateVisibility); //toggle-visibility
 router.patch("/update-role/:uid", updateUserRole); //deprecated
 
 //PATCH update creator profile
-router.patch("/update-creator/:uid", updateCreator); //deprecated - use update profile
+router.patch("/update-creator/:uid", fileUpload.single("image"), updateCreator); //deprecated - use update profile
 
 //PATCH add credits
 router.patch("/:uid/add-credits", addCredits); //deprecated
@@ -133,7 +133,10 @@ router.patch("/:uid/add-credits", addCredits); //deprecated
 //PATCH update Profile
 router.patch(
   "/update-profile/:uid",
-  fileUpload.single("image"),
+  fileUpload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'pdfResume', maxCount: 1 }
+  ]),
   updateUserProfile
 );
 router.delete("/remove-application-from-job/:userId", removeApplicationFromJob);

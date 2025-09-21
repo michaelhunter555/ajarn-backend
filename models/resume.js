@@ -9,6 +9,7 @@ const resumeSchema = new Schema({
   jobTitle: { type: String, required: false },
   from: { type: String, required: false },
   to: { type: String, required: false },
+  pdfResume: { type: String, required: false }, // URL to PDF stored in Cloudinary
 });
 
 module.exports = resumeSchema;

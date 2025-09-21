@@ -27,6 +27,13 @@ const completeOnboarding = async (req, res, next) => {
     firebaseUid } = req.body;
     const employer = req.body;
     
+    // Handle interests and skill fields that might be sent as arrays
+    const interests = Array.isArray(req.body.interests) ? req.body.interests.join(', ') : (req.body.interests || '');
+    const skill = Array.isArray(req.body.skill) ? req.body.skill.join(', ') : (req.body.skill || '');
+
+    console.log("employer", employer);
+    
+    
   // Handle image upload
   let imageUrl = "";
   if (req.file) {
@@ -46,7 +53,6 @@ const completeOnboarding = async (req, res, next) => {
   }
 
   // Debug logging
-  console.log('Onboarding completion request:', { userId, body: req.body });
   console.log('🏢 UserType received:', userType);
 
   // Get Firebase data from middleware (req.userData)
@@ -59,14 +65,19 @@ const completeOnboarding = async (req, res, next) => {
     console.log('Firebase data from middleware:', firebaseData);
   }
 
+  let orConditions = [
+    { email: email || firebaseData.email },
+    { firebaseUid: firebaseUid || firebaseData.firebaseUid },
+  ];
+
+  if(firebaseData.firebaseUid !== userId) {
+    // means they are oAuth user
+    orConditions.push({ _id: userId });
+  }
+
   try {
     // Check if user already exists
-    let existingUser = await User.findOne({ 
-      $or: [
-        { email: email || firebaseData.email },
-        { firebaseUid: firebaseUid || firebaseData.firebaseUid }
-      ]
-    });
+    let existingUser = await User.findOne({ $or: orConditions });
 
     let newUser;
     if (existingUser) {
@@ -81,6 +92,8 @@ const completeOnboarding = async (req, res, next) => {
       existingUser.workExperience = workExperience || existingUser.workExperience;
       existingUser.education = education || existingUser.education;
       existingUser.university = university || existingUser.university;
+      existingUser.interests = interests || existingUser.interests;
+      existingUser.skill = skill || existingUser.skill;
       existingUser.isOnboarded = true;
       existingUser.isVerified = true;
       
@@ -93,16 +106,20 @@ const completeOnboarding = async (req, res, next) => {
         name: name || 'User',
         email: email || firebaseData.email,
         userType: userType || 'teacher',
-        image: imageUrl || '',
+        isHidden: userType === "employer",
+        image: imageUrl ?? '',
         firebaseUid: firebaseUid || firebaseData.firebaseUid,
         nationality,
         location,
         workExperience,
         education,
         university,
+        interests,
+        skill,
         isOnboarded: true,
         isVerified: true,
-        password: null
+        password: null,
+        credits: userType === "employer" ? 15 : 0,
       });
 
       await newUser.save();

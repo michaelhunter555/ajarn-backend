@@ -2,6 +2,7 @@ const HttpError = require("../../models/http-error");
 const Creator = require("../../models/creator");
 const User = require("../../models/users");
 const { validationResult } = require("express-validator");
+const { uploadToCloudinary } = require("../../lib/cloudinaryHelper");
 
 const updateCreator = async (req, res, next) => {
   const userId = req.params.uid;
@@ -17,7 +18,42 @@ const updateCreator = async (req, res, next) => {
     );
   }
 
-  const { creator } = req.body;
+  const { 
+    creator, 
+    isRegistration,
+    company,
+    logoUrl,
+    companySize,
+    headquarters,
+    established,
+    presence,
+    about
+  } = req.body;
+
+  console.log("company", company);
+  console.log("logoUrl", logoUrl);
+  console.log("companySize", companySize);
+  console.log("headquarters", headquarters);
+  console.log("established", established);
+  console.log("presence", presence);
+  console.log("about", about);
+  console.log("needs to stick:", req.body.company);
+
+  console.log("req.body", req.body)
+
+  // Handle image upload
+  let imageUrl = "";
+  if (req.file) {
+    try {
+      console.log("📸 Uploading image to Cloudinary...");
+      imageUrl = await uploadToCloudinary(req.file.buffer);
+      //console.log("✅ Image uploaded successfully:", imageUrl);
+    } catch (err) {
+      console.error("❌ Image upload error:", err);
+      const error = new HttpError("Failed to upload image", 500);
+      return next(error);
+    }
+  }
 
   let user;
   try {
@@ -31,18 +67,31 @@ const updateCreator = async (req, res, next) => {
     return next(error);
   }
 
+  // Update user image if uploaded
+  if (imageUrl) {
+    user.image = imageUrl.secure_url;
+    user.needsOnboarding = false;
+    user.userType = "employer";
+    user.isHidden = true;
+    await user.save();
+  }
+
   const hasCreatorAccount = user && user.creator !== null;
 
-  if (!hasCreatorAccount && creator) {
+  console.log("isRegistration", isRegistration)
+
+  if (!hasCreatorAccount || isRegistration === 'true') {
     try {
       const newCreator = new Creator({
-        company: creator.company,
-        logoUrl: creator.logoUrl,
-        companySize: creator.companySize,
-        headquarters: creator.headquarters,
-        established: creator.established,
-        presence: creator.presence,
-        about: creator.about,
+        _id: user._id,
+        company: isRegistration ? company : (creator?.company || ''),
+        logoUrl: isRegistration ? logoUrl : (creator?.logoUrl || ''),
+        image: imageUrl.secure_url,
+        companySize: isRegistration ? companySize : (creator?.companySize || ''),
+        headquarters: isRegistration ? headquarters : (creator?.headquarters || ''),
+        established: isRegistration ? established : (creator?.established || ''),
+        presence: isRegistration ? presence : (creator?.presence || ''),
+        about: isRegistration ? about : (creator?.about || ''),
       });
       await newCreator.save();
       user.creator = newCreator;
@@ -74,6 +123,8 @@ const updateCreator = async (req, res, next) => {
       return next(error);
     }
   }
+
+  console.log("success", user)
 
   res.status(200).json({ ok: true, user: user });
 };

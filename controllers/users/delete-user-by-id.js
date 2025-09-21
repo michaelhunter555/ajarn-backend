@@ -29,7 +29,7 @@ const deleteUserById = async (req, res, next) => {
     return next(error);
   }
 
-  if (user._id.toString() !== req.data?.userId) {
+  if (user._id.toString() !== req.userData?.userId) {
     const error = new HttpError(
       "You are not authorized to delete this account.",
       401
@@ -39,12 +39,16 @@ const deleteUserById = async (req, res, next) => {
 
   try {
     await Blog.deleteMany({ author: user._id });
-    await Jobs.deleteMany({ userId: user.creator._id });
+    if(user.userType === "employer"){
+
+      await Jobs.deleteMany({ userId: user._id });
+    }
     await Application.deleteMany({ userId: user._id });
     await Income.deleteMany({ userId: user._id });
     await Creator.deleteMany({ userId: user._id });
-   await User.findByIdAndDelete(userId);
+    await User.findByIdAndDelete(user._id);
   } catch (err) {
+    console.log(err);
     const error = new HttpError(
       "There was an error with deleting data, please try again.",
       500

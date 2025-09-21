@@ -23,11 +23,12 @@ const userSchema = new Schema({
   workExperience: { type: String, default: "" },
   coverLetter: { type: String, default: "" },
   resume: { type: [resumeSchema], default: [] },
+  pdfResume: { type: String, default: "" }, // URL to PDF resume stored in Cloudinary
   blogPosts: [{ type: mongoose.Types.ObjectId, ref: "Blogs" }],
-  interests: { type: String, default: "" },
+  interests: { type: String, default: "", required: false },
   highestCertification: { type: String, default: "" },
   about: { type: String, default: "" },
-  skill: { type: String, default: "" },
+  skill: { type: String, default: "", required: false },
   userType: { type: String, default: "teacher" },
   creator: { type: mongoose.Types.ObjectId, default: null, ref: "Creator" },
   applications: [
