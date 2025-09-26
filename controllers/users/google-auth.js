@@ -1,70 +1,61 @@
 const HttpError = require("../../models/http-error");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/users");
-const { OAuth2Client } = require('google-auth-library');
 
-// Google OAuth JWT verification handler
+// Temporary Google sign-in handler (client-side verification; no server verification)
 const googleAuth = async (req, res, next) => {
   try {
-    const { credential } = req.body;
-    
-    if (!credential) {
-      const error = new HttpError("No Google credential provided", 400);
+    const { email, name, picture, sub, googleId } = req.body || {};
+
+    if (!email) {
+      const error = new HttpError("No email provided", 400);
       return next(error);
     }
 
-    // Verify the Google JWT
-    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    
-    const payload = ticket.getPayload();
-    const { email, name, picture } = payload;
-    
-    // Debug logging
-    console.log('Google OAuth payload:', { email, name, picture });
-    
-    // Check if user exists in database
+    // Debug logging for temporary flow
+    console.log("Google OAuth (client-provided) payload:", { email, name, picture });
+
+    // Find or create user by email
     let user = await User.findOne({ email }).populate("applications");
-    
+
     if (!user) {
-      // Create new user (needs onboarding)
       user = new User({
         email,
-        name,
+        name: name || "",
         image: picture,
-        userType: 'teacher', // Default user type
-        isEmailVerified: true, // Google emails are pre-verified
-        password: null, // No password for OAuth users
-        googleId: payload.sub, // Store Google ID
-        isOnboarded: false // New users need onboarding
+        userType: "teacher",
+        isEmailVerified: true,
+        password: null,
+        googleId: googleId || sub || null,
+        isOnboarded: false
       });
       await user.save();
     } else {
-      // Update existing user with Google info if needed
+      let hasChanges = false;
       if (!user.image && picture) {
         user.image = picture;
+        hasChanges = true;
       }
-      if (!user.googleId) {
-        user.googleId = payload.sub;
+      const incomingGoogleId = googleId || sub || null;
+      if (!user.googleId && incomingGoogleId) {
+        user.googleId = incomingGoogleId;
+        hasChanges = true;
       }
-      await user.save();
+      if (hasChanges) {
+        await user.save();
+      }
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       {
         userId: user._id,
         email: user.email,
-        userType: user.userType,
+        userType: user.userType
       },
       process.env.SECRET_WEB_TOKEN,
       { expiresIn: "10h" }
     );
 
-    // Return user data and token (same format as regular login)
     res.status(200).json({
       userId: user._id,
       email: user.email,
@@ -83,7 +74,7 @@ const googleAuth = async (req, res, next) => {
       theme: user.theme,
       name: user.name,
       isGoogleUser: true,
-      needsOnboarding: !user.isOnboarded // Flag for frontend
+      needsOnboarding: !user.isOnboarded
     });
   } catch (error) {
     console.log("Google auth error:", error);
