@@ -21,7 +21,7 @@ const generateTempToken = async (req, res, next) => {
       { expiresIn: "1h" }
     );
 
-    console.log("🎫 Generated temporary JWT token for Firebase user:", email);
+    // console.log("🎫 Generated temporary JWT token for Firebase user:", email);
 
     res.status(200).json({
       message: "Temporary token generated successfully",

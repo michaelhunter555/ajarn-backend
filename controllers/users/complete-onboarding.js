@@ -38,10 +38,10 @@ const completeOnboarding = async (req, res, next) => {
   let imageUrl = "";
   if (req.file) {
     try {
-      console.log("📸 Uploading image to Cloudinary...");
+      // console.log("📸 Uploading image to Cloudinary...");
       const cloudinaryResult = await uploadToCloudinary(req.file.buffer);
       imageUrl = cloudinaryResult.secure_url;
-      console.log("✅ Image uploaded to Cloudinary:", imageUrl);
+      // console.log("✅ Image uploaded to Cloudinary:", imageUrl);
     } catch (err) {
       console.error("❌ Error uploading image to Cloudinary:", err);
       const error = new HttpError("Failed to upload image", 500);
@@ -53,7 +53,7 @@ const completeOnboarding = async (req, res, next) => {
   }
 
   // Debug logging
-  console.log('🏢 UserType received:', userType);
+  // console.log('🏢 UserType received:', userType);
 
   // Get Firebase data from middleware (req.userData)
   let firebaseData = {};
@@ -62,7 +62,7 @@ const completeOnboarding = async (req, res, next) => {
       email: req.userData.email,
       firebaseUid: req.userData.firebaseUid
     };
-    console.log('Firebase data from middleware:', firebaseData);
+    // console.log('Firebase data from middleware:', firebaseData);
   }
 
   let orConditions = [
@@ -81,7 +81,7 @@ const completeOnboarding = async (req, res, next) => {
 
     let newUser;
     if (existingUser) {
-      console.log('👤 User already exists, updating:', existingUser._id);
+      // console.log('👤 User already exists, updating:', existingUser._id);
       // Update existing user with onboarding data
       existingUser.name = name || existingUser.name;
       existingUser.userType = userType || existingUser.userType;
@@ -98,7 +98,7 @@ const completeOnboarding = async (req, res, next) => {
       existingUser.isVerified = true;
       
       newUser = await existingUser.save();
-      console.log('✅ Existing user updated:', newUser._id);
+      // console.log('✅ Existing user updated:', newUser._id);
     } else {
       console.log('👤 Creating new user');
       // Create new user with all data
@@ -123,7 +123,7 @@ const completeOnboarding = async (req, res, next) => {
       });
 
       await newUser.save();
-      console.log('✅ New user created:', newUser._id);
+      // console.log('✅ New user created:', newUser._id);
     }
 
     if (userType === "employer") {
