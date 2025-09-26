@@ -12,10 +12,8 @@ const googleAuth = async (req, res, next) => {
       return next(error);
     }
 
-    // Debug logging for temporary flow
     console.log("Google OAuth (client-provided) payload:", { email, name, picture });
 
-    // Find or create user by email
     let user = await User.findOne({ email }).populate("applications");
 
     if (!user) {
@@ -50,7 +48,7 @@ const googleAuth = async (req, res, next) => {
       {
         userId: user._id,
         email: user.email,
-        userType: user.userType
+        userType: user.userType,
       },
       process.env.SECRET_WEB_TOKEN,
       { expiresIn: "10h" }

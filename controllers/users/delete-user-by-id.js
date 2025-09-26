@@ -43,7 +43,7 @@ const deleteUserById = async (req, res, next) => {
 
       await Jobs.deleteMany({ userId: user._id });
     }
-    await Application.deleteMany({ userId: user._id });
+    await Application.deleteMany({ creator: user._id });
     await Income.deleteMany({ userId: user._id });
     await Creator.deleteMany({ userId: user._id });
     await User.findByIdAndDelete(user._id);
