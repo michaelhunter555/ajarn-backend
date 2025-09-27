@@ -4,6 +4,7 @@ const User = require("../../models/users");
 const Job = require("../../models/jobs");
 const Application = require("../../models/application");
 const { validationResult } = require("express-validator");
+const { handleNewApplication } = require("../../lib/brevoHelper");
 
 //POST apply to jobs
 const applyToJobById = async (req, res, next) => {
@@ -111,6 +112,8 @@ const applyToJobById = async (req, res, next) => {
     await job.save({ session: sess });
     //commit transaction
     await sess.commitTransaction();
+
+    await handleNewApplication(user.name, user.email, user.name, job.name);
   } catch (err) {
     console.log(err);
     const error = new HttpError(

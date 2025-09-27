@@ -86,7 +86,6 @@ const completeOnboarding = async (req, res, next) => {
       existingUser.name = name || existingUser.name;
       existingUser.userType = userType || existingUser.userType;
       existingUser.image = imageUrl || existingUser.image;
-      existingUser.firebaseUid = firebaseUid || firebaseData.firebaseUid || existingUser.firebaseUid;
       existingUser.nationality = nationality || existingUser.nationality;
       existingUser.location = location || existingUser.location;
       existingUser.workExperience = workExperience || existingUser.workExperience;
@@ -96,6 +95,12 @@ const completeOnboarding = async (req, res, next) => {
       existingUser.skill = skill || existingUser.skill;
       existingUser.isOnboarded = true;
       existingUser.isVerified = true;
+      existingUser.credits = userType === "employer" ? 15 : 0;
+
+      const finalFirebaseUid = firebaseUid || firebaseData.firebaseUid || existingUser.firebaseUid;
+      if (finalFirebaseUid && finalFirebaseUid !== 'undefined') {
+        existingUser.firebaseUid = finalFirebaseUid;
+      }
       
       newUser = await existingUser.save();
       // console.log('✅ Existing user updated:', newUser._id);
