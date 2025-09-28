@@ -128,6 +128,7 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
+  //gg
   //return user object on success
   res.status(200).json({
     userId: identifiedUser._id,
