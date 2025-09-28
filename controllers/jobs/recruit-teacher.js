@@ -64,15 +64,17 @@ const recruitTeacher = async (req, res, next) => {
     await teacher.save({ session: sess });
     await sess.commitTransaction();
 
+   if(newRecruitment) {
     await handleNewRecruitment(
-      teacher.email, 
-      teacher.name, 
-      newRecruitment.company, 
-      newRecruitment.jobTitle, 
-      newRecruitment.salary, 
-      newRecruitment.location
-    );
-    
+      teacher.email,
+      teacher.name,
+      recruitment.company,
+      recruitment.jobTitle,
+      recruitment.salary,
+      recruitment.location,
+      newRecruitmentData.recruitmentMessage,
+    )
+ }
     res
       .status(201)
       .json({ message: "Recruitment sent successfully", ok: true });

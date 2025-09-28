@@ -138,6 +138,7 @@ const login = async (req, res, next) => {
     token: token,
     coverLetter: identifiedUser.coverLetter,
     resume: identifiedUser.resume,
+    pdfResume: identifiedUser.pdfResume,
     incomeDirectory: identifiedUser.incomeDirectory,
     applications: identifiedUser.applications,
     jobs: identifiedUser.jobs,

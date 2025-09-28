@@ -56,7 +56,16 @@ router.post(
       return allowedSalary.includes(value);
     }),
     check("requirements").custom((value) => {
-      return coreJobRequirements.includes(value);
+      const items = String(value)
+        .split(",")
+        .map((v) => v.trim())
+        .filter(Boolean);
+
+      if (items.length < 1 || items.length > 2) {
+        return false;
+      }
+
+      return items.every((req) => coreJobRequirements.includes(req));
     }),
     check("workPermit").custom((value) => {
       const allowedValue = [true, false];

@@ -61,6 +61,7 @@ const googleAuth = async (req, res, next) => {
       token: token,
       coverLetter: user.coverLetter,
       resume: user.resume,
+      pdfResume: user.pdfResume,
       incomeDirectory: user.incomeDirectory,
       applications: user.applications,
       jobs: user.jobs,
