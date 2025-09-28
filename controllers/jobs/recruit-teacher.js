@@ -4,6 +4,7 @@ const HttpError = require("../../models/http-error");
 const mongoose = require("mongoose");
 const createDOMPurify = require("dompurify");
 const { JSDOM } = require("jsdom");
+const { handleNewRecruitment } = require("../../lib/brevoHelper");
 
 const recruitTeacher = async (req, res, next) => {
   const { recruitment } = req.body;
@@ -62,6 +63,16 @@ const recruitTeacher = async (req, res, next) => {
     teacher.recruitmentReceived.push(newRecruitment._id);
     await teacher.save({ session: sess });
     await sess.commitTransaction();
+
+    await handleNewRecruitment(
+      teacher.email, 
+      teacher.name, 
+      newRecruitment.company, 
+      newRecruitment.jobTitle, 
+      newRecruitment.salary, 
+      newRecruitment.location
+    );
+    
     res
       .status(201)
       .json({ message: "Recruitment sent successfully", ok: true });
