@@ -30,17 +30,6 @@ const updateCreator = async (req, res, next) => {
     about
   } = req.body;
 
-  console.log("company", company);
-  console.log("logoUrl", logoUrl);
-  console.log("companySize", companySize);
-  console.log("headquarters", headquarters);
-  console.log("established", established);
-  console.log("presence", presence);
-  console.log("about", about);
-  console.log("needs to stick:", req.body.company);
-
-  console.log("req.body", req.body)
-
   // Handle image upload
   let imageUrl = "";
   if (req.file) {
@@ -68,17 +57,24 @@ const updateCreator = async (req, res, next) => {
   }
 
   // Update user image if uploaded
-  if (imageUrl) {
-    user.image = imageUrl.secure_url;
+
+  if(isRegistration === 'true') {
     user.needsOnboarding = false;
     user.userType = "employer";
     user.isHidden = true;
+    user.credits = 15;
+    user.isOnboarded = true;
+    await user.save()
+  }
+
+  if (imageUrl) {
+    user.image = imageUrl.secure_url;
     await user.save();
   }
 
   const hasCreatorAccount = user && user.creator !== null;
 
-  console.log("isRegistration", isRegistration)
+  //console.log("isRegistration", isRegistration)
 
   if (!hasCreatorAccount || isRegistration === 'true') {
     try {
@@ -124,7 +120,7 @@ const updateCreator = async (req, res, next) => {
     }
   }
 
-  console.log("success", user)
+  //console.log("success", user)
 
   res.status(200).json({ ok: true, user: user });
 };

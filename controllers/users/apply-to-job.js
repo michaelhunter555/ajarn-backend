@@ -113,7 +113,12 @@ const applyToJobById = async (req, res, next) => {
     //commit transaction
     await sess.commitTransaction();
 
-    await handleNewApplication(user.name, user.email, user.name, job.name);
+    //get the job owner
+    const jobOwner = await User.findById(job.creator).select("name email");
+    if(jobOwner) {
+      await handleNewApplication(jobOwner.name, jobOwner.email, user.name, job.title);
+    }
+
   } catch (err) {
     console.log(err);
     const error = new HttpError(

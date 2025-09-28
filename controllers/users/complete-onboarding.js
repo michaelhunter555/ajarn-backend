@@ -185,7 +185,7 @@ const completeOnboarding = async (req, res, next) => {
       buffetEndDate: newUser.buffetEndDate,
       theme: newUser.theme,
       needsOnboarding: false,
-      credits: 15
+      credits: newUser.credits
     });
   } catch (err) {
     console.log("User creation error:", err);

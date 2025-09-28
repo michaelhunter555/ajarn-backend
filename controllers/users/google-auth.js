@@ -12,8 +12,6 @@ const googleAuth = async (req, res, next) => {
       return next(error);
     }
 
-    console.log("Google OAuth (client-provided) payload:", { email, name, picture });
-
     let user = await User.findOne({ email }).populate("applications");
 
     if (!user) {
