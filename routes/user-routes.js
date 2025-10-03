@@ -32,6 +32,8 @@ const removeApplicationFromJob = require("../controllers/users/remove-applicatio
 const toggleUserTheme = require("../controllers/users/toggle-theme");
 const postUserFeedback = require("../controllers/users/user-feedback");
 const deleteUserById = require("../controllers/users/delete-user-by-id");
+const deletePdfResume = require("../controllers/users/delete-pdfResume");
+const supportEmail = require("../controllers/users/support-email");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -108,8 +110,9 @@ router.get("/get-recruitment-offers/:userId", getUserRecruitments);
 
 router.post("/user-feedback/:userId", postUserFeedback);
 router.post("/toggle-theme/:userId", toggleUserTheme);
+router.post("/support-email", supportEmail);
 //POST
-router.post("/recruitment-offfer-response/:userId", recruitmentResponse);
+router.post("/recruitment-offer-response/:userId", recruitmentResponse);
 //POST
 router.post("/income-directory/:uid", IncomeDirectoryContribution);
 
@@ -143,5 +146,6 @@ router.delete("/remove-application-from-job/:userId", removeApplicationFromJob);
 router.delete("/remove-applicants", removeApplicantsById);
 router.delete("/remove-recruits-by-id", removeRecruitById);
 router.delete("/delete-user-by-id", deleteUserById);
+router.delete("/delete-pdf-resume/:userId", deletePdfResume);
 
 module.exports = router;

@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
   // console.log("Checked auth token");
   try {
     const token = req.headers.authorization.split(" ")[1];
-    console.log("🔑 Token received:", token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+  //  console.log("🔑 Token received:", token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
 
     if (!token) {
       console.log("❌ No token provided");

@@ -1,6 +1,10 @@
 const User = require("../../models/users");
 const Billing = require("../../models/billing");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const { 
+  handleAdminStripeTransactionNotification,
+  handleCustomerStripeTransactionNotification
+} = require("../../lib/brevoHelper");
 
 const stripeWebhook = async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
@@ -15,20 +19,24 @@ const stripeWebhook = async (req, res, next) => {
     return res.sendStatus(400);
   }
 
-  console.log("Successfully Signed webhook");
+  //console.log("Successfully Signed webhook");
 
   try {
     switch (event.type) {
       case "checkout.session.completed":
         {
           const purchase = event.data.object;
-          // console.log("customer", purchase);
+          const paymentIntent = await stripe.paymentIntents.retrieve(purchase.payment_intent, {
+            expand: ["charges.data"],
+          });
+          const charge = paymentIntent.charges.data[0];
+
           const user = await User.findOne({
             stripeCustomerId: purchase.customer,
           });
 
           if (user) {
-            user.credits = user.credits += parseInt(
+            user.credits += parseInt(
               purchase.metadata.credits,
               10
             );
@@ -43,6 +51,11 @@ const stripeWebhook = async (req, res, next) => {
             await newBillingObject.save();
             user.billingData.push(newBillingObject._id);
             await user.save();
+
+            const amountFormatted = (purchase.amount_total / 100).toFixed(2);
+
+            await handleAdminStripeTransactionNotification(user, amountFormatted, charge);
+            await handleCustomerStripeTransactionNotification(user, amountFormatted, charge);
           }
         }
         break;
