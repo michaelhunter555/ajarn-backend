@@ -27,9 +27,11 @@ const stripeWebhook = async (req, res, next) => {
         {
           const purchase = event.data.object;
           const paymentIntent = await stripe.paymentIntents.retrieve(purchase.payment_intent, {
-            expand: ["charges.data"],
+            expand: ["latest_charge"],
           });
-          const charge = paymentIntent.charges.data[0];
+          const charge = paymentIntent?.latest_charge;
+
+        //  console.log("charge", charge);
 
           const user = await User.findOne({
             stripeCustomerId: purchase.customer,

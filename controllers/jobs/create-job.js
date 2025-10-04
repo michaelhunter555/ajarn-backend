@@ -162,18 +162,7 @@ const createJob = async (req, res, next) => {
     });
     await createJobTransaction.save();
 
-    if(createdJob && createdJob.jobType === 'featured') {
-      const jobUrl = `https://ajarnjobs.com/jobs/${createdJob._id}/${createdJob.title?.replace(/\s+/g, "-")?.toLowerCase()}`;
-
-      const payFrequency = jobType === "full-time" ? "month" : "hour";
-      await createXTweet(createdJob, payFrequency, jobUrl);
-
-      const fbData = await Facebook.findOne({ platform: 'Facebook' });
-      if(fbData) {
-        const pageAccessToken = decryptData(fbData.pageAccessToken);
-        await createFacebookPost(createdJob, payFrequency, jobUrl, pageAccessToken);
-      }
-    }
+    console.log("✅ Job created successfully");
 
 
   } catch (err) {
@@ -183,6 +172,24 @@ const createJob = async (req, res, next) => {
   } finally {
     if (sess) {
       sess.endSession();
+    }
+  }
+
+  console.log("createdJob", createdJob.jobType);
+  if(createdJob && createdJob.jobType === 'featured') {
+    try {
+      console.log("Featured job: running social media boost");
+      const jobUrl = `https://ajarnjobs.com/jobs/${createdJob._id}/${createdJob.title?.replace(/\s+/g, "-")?.toLowerCase()}`;
+  
+      await createXTweet(createdJob, jobUrl);
+  
+      const fbData = await Facebook.findOne({ platform: 'Facebook' });
+      if(fbData) {
+        const pageAccessToken = decryptData(fbData.pageAccessToken);
+        await createFacebookPost(createdJob, jobUrl, pageAccessToken);
+      }
+    } catch (err) {
+      console.log(err);
     }
   }
 
