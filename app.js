@@ -11,6 +11,7 @@ const stripeRoutes = require("./routes/stripe-routes");
 const checkJobExpiration = require("./controllers/jobs/check-job-expiration");
 const HttpError = require("./models/http-error");
 const cron = require("node-cron");
+const { facebookCallback } = require("./lib/socialMediaBoost");
 const app = express();
 
 app.use((req, res, next) => {
@@ -20,6 +21,8 @@ app.use((req, res, next) => {
     bodyParser.json()(req, res, next);
   }
 });
+
+app.get("/api/facebook/callback", facebookCallback);
 
 //app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));

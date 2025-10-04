@@ -7,6 +7,9 @@ const User = require("../../models/users");
 const Creator = require("../../models/creator");
 const { JSDOM } = require("jsdom");
 const createDOMPurify = require("dompurify");
+const { createXTweet, createFacebookPost } = require("../../lib/socialMediaBoost");
+const Facebook = require("../../models/SocialMedia");
+const { decryptData } = require("../../lib/encryption");
 
 //job POST
 const createJob = async (req, res, next) => {
@@ -158,6 +161,21 @@ const createJob = async (req, res, next) => {
       productName: `Created ${jobType} job (${credits})`,
     });
     await createJobTransaction.save();
+
+    if(createdJob && createdJob.jobType === 'featured') {
+      const jobUrl = `https://ajarnjobs.com/jobs/${createdJob._id}/${createdJob.title?.replace(/\s+/g, "-")?.toLowerCase()}`;
+
+      const payFrequency = jobType === "full-time" ? "month" : "hour";
+      await createXTweet(createdJob, payFrequency, jobUrl);
+
+      const fbData = await Facebook.findOne({ platform: 'Facebook' });
+      if(fbData) {
+        const pageAccessToken = decryptData(fbData.pageAccessToken);
+        await createFacebookPost(createdJob, payFrequency, jobUrl, pageAccessToken);
+      }
+    }
+
+
   } catch (err) {
     console.log(err);
     const error = new HttpError("Creating job failed, please try again", 500);

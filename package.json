@@ -27,6 +27,7 @@
     "nodemailer": "^6.9.14",
     "streamifier": "^0.1.1",
     "stripe": "^15.8.0",
+    "twitter-api-v2": "^1.27.0",
     "uuid": "^9.0.0",
     "uuidv4": "^6.2.13"
   },
