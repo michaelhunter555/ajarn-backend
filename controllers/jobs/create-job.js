@@ -175,7 +175,7 @@ const createJob = async (req, res, next) => {
     }
   }
 
-  console.log("createdJob", createdJob.jobType);
+ // console.log("createdJob", createdJob.jobType);
   if(createdJob && createdJob.jobType === 'featured') {
     try {
       console.log("Featured job: running social media boost");

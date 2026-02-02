@@ -3,13 +3,14 @@ const mongoose = require("mongoose");
 
 const checkJobExpiration = async () => {
   const today = new Date();
-  //if the value exceeds 20 days
+  // if the value exceeds 20 days
   // from time posted until today
   // job should be deleted.
   const maxPostDuration = 20 * 24 * 60 * 60 * 1000;
-  //i.e today - 20 days (ms)
+  // i.e today - 20 days (ms)
   const breakPoint = today.getTime() - maxPostDuration;
 
+  // find all jobs that are created before 20 days
   try {
     const job = await Job.find({});
     let removeJobsArr = [];
