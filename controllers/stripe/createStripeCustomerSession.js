@@ -12,8 +12,8 @@ const createStripeCheckout = async (req, res, next) => {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const agency = "price_1PNxLvRpnv4ckgZhMFUfhKqZ";
-  const enterprise = "price_1PNxMiRpnv4ckgZhTjkWZrsD";
+  const agency = "price_1T2BhlRpnv4ckgZhMthFDiLR";// test-"price_1PNxLvRpnv4ckgZhMFUfhKqZ";
+  const enterprise = "price_1T2BinRpnv4ckgZh8KbsopoA";// test-"price_1PNxMiRpnv4ckgZhTjkWZrsD";
   const canDiscount = priceId === agency || priceId === enterprise;
 
   let customer;
@@ -31,7 +31,7 @@ const createStripeCheckout = async (req, res, next) => {
     try {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
-        line_items: [{ price: priceId, quantity: 1 }],
+        line_items: [{ price: priceId, quantity: 1 }], // priceId
         mode: "payment",
         customer: user.stripeCustomerId,
         success_url: `${req.headers.origin}/users/${userId}?stripe=success`,
@@ -44,7 +44,7 @@ const createStripeCheckout = async (req, res, next) => {
           ? {
               discounts: [
                 {
-                  coupon: "u8IMpn21",
+                  coupon: "UG6vqhaL",// test-"u8IMpn21",
                 },
               ],
             }
