@@ -18,10 +18,12 @@ const likeComment = require("../controllers/blog/comments/like-comment");
 const dislikeComment = require("../controllers/blog/comments/dislike-comment");
 const getCommentDislikesById = require("../controllers/blog/comments/get-comment-dislikes-by-id");
 const getCommentLikesById = require("../controllers/blog/comments/get-comment-likes-by-id");
-
+const requireSelf = require("../middleware/require-self");
+const { blogWriteLimiter } = require("../middleware/rate-limiters");
 const { check } = require("express-validator");
 const checkAuth = require("../middleware/auth");
 const { blogCategories } = require("../dummy_data/ThaiData");
+const toggleUserTheme = require("../controllers/users/toggle-theme");
 
 /*GET Routes */
 
@@ -51,17 +53,20 @@ router.get("/posts/:uid", getBlogPostByUserId);
 
 /*POST Routes */
 
+router.use(checkAuth);
 //POST add a comment
 router.post(
   "/add-comment/:uid/post/:bid",
+  blogWriteLimiter,
   [check("postComment").not().isEmpty()],
-  checkAuth,
+  requireSelf((req) => req.params.uid),
   addComment
 );
 
 //POST create blog post
 router.post(
   "/new-post/:uid",
+  blogWriteLimiter,
   [
     check("title").not().isEmpty(),
     check("category").custom((val) => {
@@ -70,27 +75,28 @@ router.post(
     }),
     check("postContent").isLength({ min: 7 }),
   ],
-  checkAuth,
+  requireSelf((req) => req.params.uid),
   addNewBlogPost
 );
 
 /*PATCH Routes */
 
 //PATCH like Content Post
-router.patch("/post/:bid/like/:uid", checkAuth, likeContentPost);
+router.patch("/post/:bid/like/:uid", blogWriteLimiter, requireSelf((req) => req.params.uid), likeContentPost);
 
 //PATCH dislike Content Post
-router.patch("/post/:bid/dislike/:uid", checkAuth, dislikeContentPost);
+router.patch("/post/:bid/dislike/:uid", blogWriteLimiter, requireSelf((req) => req.params.uid), dislikeContentPost);
 
 //PATCH like Comment Post
-router.patch("/post/:bid/comment/like/:uid", checkAuth, likeComment);
+router.patch("/post/:bid/comment/like/:uid", blogWriteLimiter, requireSelf((req) => req.params.uid), likeComment);
 
 //PATCH dislike Comment Post
-router.patch("/post/:bid/comment/dislike/:uid", checkAuth, dislikeComment);
+router.patch("/post/:bid/comment/dislike/:uid", blogWriteLimiter, requireSelf((req) => req.params.uid), dislikeComment);
 
 //PATCH update blog post
 router.patch(
   "/post/:bid",
+  blogWriteLimiter,
   [
     check("title").not().isEmpty(),
     check("category").custom((val) => {
@@ -99,24 +105,25 @@ router.patch(
     }),
     check("postContent").isLength({ min: 7 }),
   ],
-  checkAuth,
+  requireSelf((req) => req.params.uid),
   updateBlogPostById
 );
 
 //PATCH update comment
 router.patch(
   "/update-comment/:uid/post/:bid",
+  blogWriteLimiter,
   [check("comment").not().isEmpty()],
-  checkAuth,
+  requireSelf((req) => req.params.uid),
   updateComment
 );
 
 /*DELETE Routes */
 
 //DELETE delete comment
-router.delete("/delete-comment/:cid/post/:bid", checkAuth, deleteComment);
+router.delete("/delete-comment/:cid/post/:bid", blogWriteLimiter, requireSelf((req) => req.params.uid), deleteComment);
 
 //DELETE delete blog post
-router.delete("/post/:bid", checkAuth, deleteBlogPostById);
+router.delete("/post/:bid", blogWriteLimiter, requireSelf((req) => req.params.uid), deleteBlogPostById);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const checkAuth = require("../middleware/auth");
+const requireSelf = require("../middleware/require-self");
 const getAllJobs = require("../controllers/jobs/get-all-jobs");
 const getJobById = require("../controllers/jobs/get-job-by-id");
 const getJobsByUserId = require("../controllers/jobs/get-jobs-by-user-id");
@@ -14,6 +15,7 @@ const getFeaturedJobs = require("../controllers/jobs/get-featured-jobs");
 const recruitTeacher = require("../controllers/jobs/recruit-teacher");
 const bulkDeleteJobsById = require("../controllers/jobs/bulk-delete-jobs-by-id");
 const reportJobViolation = require("../controllers/jobs/report-job-violation");
+const { jobCreateLimiter, recruitLimiter, supportLimiter } = require("../middleware/rate-limiters");
 const { check } = require("express-validator");
 
 const {
@@ -42,10 +44,12 @@ router.use(checkAuth);
 
 //POST job
 
-router.post("/recruit-teacher", recruitTeacher);
-router.post("/job-post-violation", reportJobViolation);
+router.post("/recruit-teacher", recruitLimiter, requireSelf((req) => req.body?.recruitment?.userId), recruitTeacher);
+router.post("/job-post-violation", supportLimiter, requireSelf((req) => req.body?.jobViolation?.user), reportJobViolation);
 router.post(
   "/create-job/:uid",
+  jobCreateLimiter,
+  requireSelf((req) => req.params.uid),
   //job validation logic
   //salary, location, and requirement inputs must match pre-set Data lists in ../dummy_data/thaiCities
   [
@@ -94,7 +98,7 @@ router.patch(
 );
 
 //activate teacher buffet
-router.patch("/activate-buffet/:uid", activateBuffet);
+router.patch("/activate-buffet/:uid", requireSelf((req) => req.params.uid), activateBuffet);
 
 router.delete("/bulk-job-delete", bulkDeleteJobsById);
 //delete jobById

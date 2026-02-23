@@ -14,7 +14,7 @@ const getUserBillingData = async (req, res, next) => {
 
   try {
     const userBilling = await UserBilling.find({ userId })
-      .sort({ purchaseDate: 1 })
+      .sort({ purchaseDate: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
 

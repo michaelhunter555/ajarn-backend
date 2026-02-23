@@ -8,6 +8,7 @@ const jobRoutes = require("./routes/job-routes");
 const userRoutes = require("./routes/user-routes");
 const blogRoutes = require("./routes/blog-routes");
 const stripeRoutes = require("./routes/stripe-routes");
+const screeningRoutes = require("./routes/screening-routes");
 const checkJobExpiration = require("./controllers/jobs/check-job-expiration");
 const HttpError = require("./models/http-error");
 const cron = require("node-cron");
@@ -39,6 +40,7 @@ app.use("/api/jobs", jobRoutes); // => /api/jobs/...
 app.use("/api/user", userRoutes); // => /api/users/...
 app.use("/api/blog", blogRoutes); // => /api/blog/...
 app.use("/api/stripe", stripeRoutes); // add routes!!!
+app.use("/api/screenings", screeningRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route", 404);

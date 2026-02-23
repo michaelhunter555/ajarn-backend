@@ -5,9 +5,18 @@ const Application = require("../../models/application");
 const Creator = require("../../models/creator");
 const Jobs = require("../../models/jobs");
 const Income = require("../../models/income");
+const requireSelf = require("../../middleware/require-self");
 
 const deleteUserById = async (req, res, next) => {
   const { userId } = req.body;
+
+  if(userId.toString() !== req.userData.userId.toString()){
+    const error = new HttpError(
+      "Forbidden - You are not authorized to delete this account.",
+      403
+    );
+    return next(error);
+  }
 
   let user;
 
@@ -29,13 +38,6 @@ const deleteUserById = async (req, res, next) => {
     return next(error);
   }
 
-  if (user._id.toString() !== req.userData?.userId) {
-    const error = new HttpError(
-      "You are not authorized to delete this account.",
-      401
-    );
-    return next(error);
-  }
 
   try {
     await Blog.deleteMany({ author: user._id });

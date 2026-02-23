@@ -1,5 +1,6 @@
 const express = require("express");
 const checkAuth = require("../middleware/auth");
+const requireSelf = require("../middleware/require-self");
 const router = express.Router();
 const getUsers = require("../controllers/users/get-users");
 const getVisibleUsers = require("../controllers/users/get-visible-users");
@@ -34,6 +35,13 @@ const postUserFeedback = require("../controllers/users/user-feedback");
 const deleteUserById = require("../controllers/users/delete-user-by-id");
 const deletePdfResume = require("../controllers/users/delete-pdfResume");
 const supportEmail = require("../controllers/users/support-email");
+const {
+  loginLimiter,
+  signupLimiter,
+  authBootstrapLimiter,
+  profileUpdateLimiter,
+  supportLimiter,
+} = require("../middleware/rate-limiters");
 const { check } = require("express-validator");
 
 //const checkAuth = require("../middleware/auth");
@@ -63,6 +71,7 @@ router.get("/:uid", getUserById);
 //POST sign-up post
 router.post(
   "/sign-up",
+  signupLimiter,
   fileUpload.single("image"),
   [
     check("name").not().isEmpty(),
@@ -76,18 +85,19 @@ router.post(
 //POST login
 router.post(
   "/login",
+  loginLimiter,
   [check("email").isEmail()],
   login
 );
 
 //POST Google OAuth
-router.post("/google-auth", googleAuth);
+router.post("/google-auth", authBootstrapLimiter, googleAuth);
 
 //POST Firebase Signup (after email verification)
-router.post("/firebase-signup", firebaseSignup);
+router.post("/firebase-signup", authBootstrapLimiter, firebaseSignup);
 
 //POST Generate temporary JWT token for Firebase-verified users
-router.post("/generate-temp-token", generateTempToken);
+router.post("/generate-temp-token", authBootstrapLimiter, generateTempToken);
 
 //***check Authentication***
 router.use(checkAuth);
@@ -96,56 +106,58 @@ router.use(checkAuth);
 router.post("/complete-onboarding/:uid", fileUpload.single("image"), completeOnboarding);
 
 //GET user applications
-router.get("/get-applications/:userId", getUserApplications);
+router.get("/get-applications/:userId", requireSelf((req) => req.params.userId), getUserApplications);
 
 //GET Employer Recruits
-router.get("/get-employer-recruits/:creatorId", getEmployerRecruits);
+router.get("/get-employer-recruits/:creatorId", requireSelf((req) => req.params.creatorId), getEmployerRecruits);
 //GET applicants by creatorId
-router.get("/applicants/:creatorId", getApplicantsByCreator);
+router.get("/applicants/:creatorId", requireSelf((req) => req.params.creatorId), getApplicantsByCreator);
 
 //GET user recruitment Offers (if any)
-router.get("/get-recruitment-offers/:userId", getUserRecruitments);
+router.get("/get-recruitment-offers/:userId", requireSelf((req) => req.params.userId), getUserRecruitments);
 
 /* CLOSED POST ROUTE */
 
-router.post("/user-feedback/:userId", postUserFeedback);
-router.post("/toggle-theme/:userId", toggleUserTheme);
-router.post("/support-email", supportEmail);
+router.post("/user-feedback/:userId", supportLimiter, requireSelf((req) => req.params.userId), postUserFeedback);
+router.post("/toggle-theme/:userId", requireSelf((req) => req.params.userId), toggleUserTheme);
+router.post("/support-email", supportLimiter, requireSelf((req) => req.body.userId), supportEmail);
 //POST
-router.post("/recruitment-offer-response/:userId", recruitmentResponse);
+router.post("/recruitment-offer-response/:userId", requireSelf((req) => req.params.userId), recruitmentResponse);
 //POST
-router.post("/income-directory/:uid", IncomeDirectoryContribution);
+router.post("/income-directory/:uid", requireSelf((req) => req.params.uid), IncomeDirectoryContribution);
 
 //POST applyToJob
-router.post("/:uid/apply/:jid", applyToJobById);
+router.post("/:uid/apply/:jid", requireSelf((req) => req.params.uid), applyToJobById);
 
 /* PATCH ROUTES */
 
 //PATCH update profile visiblity
-router.patch("/update-visibility/:uid", updateVisibility); //toggle-visibility
+router.patch("/update-visibility/:uid", requireSelf((req) => req.params.uid), updateVisibility); //toggle-visibility
 
 //PATCH update userRole (userType)
-router.patch("/update-role/:uid", updateUserRole); //deprecated
+router.patch("/update-role/:uid", requireSelf((req) => req.params.uid), updateUserRole); //deprecated
 
 //PATCH update creator profile
-router.patch("/update-creator/:uid", fileUpload.single("image"), updateCreator); //deprecated - use update profile
+router.patch("/update-creator/:uid", requireSelf((req) => req.params.uid), fileUpload.single("image"), updateCreator); //deprecated - use update profile
 
 //PATCH add credits
-router.patch("/:uid/add-credits", addCredits); //deprecated
+router.patch("/:uid/add-credits", requireSelf((req) => req.params.uid), addCredits); //deprecated
 
 //PATCH update Profile
 router.patch(
   "/update-profile/:uid",
+  profileUpdateLimiter,
+  requireSelf((req) => req.params.uid),
   fileUpload.fields([
     { name: 'image', maxCount: 1 },
     { name: 'pdfResume', maxCount: 1 }
   ]),
   updateUserProfile
 );
-router.delete("/remove-application-from-job/:userId", removeApplicationFromJob);
+router.delete("/remove-application-from-job/:userId", requireSelf((req) => req.params.userId), removeApplicationFromJob);
 router.delete("/remove-applicants", removeApplicantsById);
 router.delete("/remove-recruits-by-id", removeRecruitById);
 router.delete("/delete-user-by-id", deleteUserById);
-router.delete("/delete-pdf-resume/:userId", deletePdfResume);
+router.delete("/delete-pdf-resume/:userId", requireSelf((req) => req.params.userId), deletePdfResume);
 
 module.exports = router;

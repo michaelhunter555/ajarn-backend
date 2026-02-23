@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const stripeWebhook = require("../controllers/stripe/webhook");
 const getUserBillingData = require("../controllers/stripe/get-user-billing-data");
 const checkAuth = require("../middleware/auth");
+const requireSelf = require("../middleware/require-self");
+const { billingLimiter } = require("../middleware/rate-limiters");
 //router.get("/:stripeCustomerId/charges", checkAuth);
 //middleware to check for invalid token request
 
@@ -18,8 +20,13 @@ router.post(
 
 //check token for creating checkouts and retrieving billing data.
 router.use(checkAuth);
-router.get("/user-billing/:userId", getUserBillingData);
-router.post("/:userId/create-stripe-checkout", createStripeCheckout);
+router.get("/user-billing/:userId", requireSelf((req) => req.params.userId), getUserBillingData);
+router.post(
+  "/:userId/create-stripe-checkout",
+  billingLimiter,
+  requireSelf((req) => req.params.userId),
+  createStripeCheckout
+);
 //router.post("/delete-customer", checkAuth);
 
 module.exports = router;
