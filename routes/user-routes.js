@@ -43,7 +43,11 @@ const {
   supportLimiter,
 } = require("../middleware/rate-limiters");
 const { check } = require("express-validator");
-
+const getAllChatMessages = require("../controllers/chats/get-all-chat-messages");
+const updateChat = require("../controllers/chats/update-chat");
+const getAllChats = require("../controllers/chats/get-all-chats");
+const leaveChat = require("../controllers/chats/leave-chat");
+const createChat = require("../controllers/chats/create-chat");
 //const checkAuth = require("../middleware/auth");
 //const { thaiCities } = require("../dummy_data/ThaiData");
 
@@ -104,6 +108,13 @@ router.use(checkAuth);
 
 //POST complete onboarding (protected route)
 router.post("/complete-onboarding/:uid", fileUpload.single("image"), completeOnboarding);
+router.post("/leave-chat/:userId", requireSelf((req) => req.params.userId), leaveChat);
+router.post("/create-chat/:senderId", requireSelf((req) => req.params.senderId), createChat);
+
+// GET all messages
+router.get("/get-all-chat-messages/:userId", requireSelf((req) => req.params.userId), getAllChatMessages);
+router.get("/get-all-chats/:userId", requireSelf((req) => req.params.userId), getAllChats);
+
 
 //GET user applications
 router.get("/get-applications/:userId", requireSelf((req) => req.params.userId), getUserApplications);
@@ -130,6 +141,9 @@ router.post("/income-directory/:uid", requireSelf((req) => req.params.uid), Inco
 router.post("/:uid/apply/:jid", requireSelf((req) => req.params.uid), applyToJobById);
 
 /* PATCH ROUTES */
+
+//PATCH update chat
+router.patch("/update-chat/:senderId", requireSelf((req) => req.params.senderId), updateChat);
 
 //PATCH update profile visiblity
 router.patch("/update-visibility/:uid", requireSelf((req) => req.params.uid), updateVisibility); //toggle-visibility

@@ -2,12 +2,15 @@ const Chats = require("../../models/chats");
 const Message = require("../../models/messages");
 const User = require("../../models/users");
 const HttpError = require("../../models/http-error");
+const { getIO, checkRoom, NotificationsList } = require("../../lib/socket");
+
 
 const createChat = async (req, res, next) => {
     const { senderId } = req.params;
   const { teacherData, employerData, message } = req.body;
 
-  if(req?.userData?.userId?.toString() !== employerId?.toString()){
+  if(req?.userData?.userId?.toString() !== senderId?.toString()){
+    console.log("blocked")
     const error = new HttpError(
       "Forbidden - You are not authorized to create a chat with this user.",
       403
@@ -21,7 +24,7 @@ const createChat = async (req, res, next) => {
     participantInfo: [
       {
         id: teacherData._id,
-        name: teacher.name,
+        name: teacherData.name,
         image: teacherData.image,
         userType: teacherData.userType,
       },
@@ -45,6 +48,27 @@ const createChat = async (req, res, next) => {
   try {
     await newChat.save();
     await newMessage.save();
+
+    if (teacherData?._id && checkRoom(teacherData._id)) {
+        const io = getIO();
+        io.to(String(teacherData._id)).emit(NotificationsList.newMessage, {
+            message: message,
+            senderId: senderId,
+            chatId: newChat._id,
+            userData: {
+                name: employerData.name,
+                image: employerData.image,
+                userType: employerData.userType,
+                id: employerData._id,
+            },
+        });
+    } else {
+        const user = await User.findById(teacherData._id).select("name email").lean();
+        if(user) {
+            await handleNewMessageEmailNotification(employerData.name, user.email, message);
+        }
+
+    }
     res.status(201).json({ chatId: newChat._id, ok: true });
   } catch (err) {
     const error = new HttpError(

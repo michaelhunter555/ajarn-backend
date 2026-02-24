@@ -6,9 +6,7 @@ const updateScreening = require("../controllers/screenings/update-screening");
 const deleteScreening = require("../controllers/screenings/delete-screening");
 const sendoutScreening = require("../controllers/screenings/sendout-screening");
 const aiAnalyzeScreening = require("../controllers/screenings/ai-analyze-screening");
-const startScreening = require("../controllers/screenings/start-screening");
 const updateScreeningResults = require("../controllers/screenings/update-screening-results");
-const completeScreeningResult = require("../controllers/screenings/complete-screening-result");
 
 const router = express.Router();
 
@@ -30,8 +28,6 @@ router.patch("/:sid", updateScreening);
 router.delete("/:sid", deleteScreening);
 router.post("/:sid/sendout", sendoutScreening);
 router.post("/:sid/ai-analyze", aiAnalyzeScreening);
-router.post("/:sid/start", startScreening);
 router.patch("/results/:rid/answer", updateScreeningResults);
-router.post("/results/:rid/complete", completeScreeningResult);
 
 module.exports = router;

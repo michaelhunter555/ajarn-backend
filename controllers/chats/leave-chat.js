@@ -23,7 +23,7 @@ const leaveChat = async (req, res, next) => {
     res.status(200).json({ ok: true });
   } catch(err) {
     console.log(err);
-    res.status(500).json({ error: err, ok: false });
+    res.status(500).json({ message: err, ok: false });
   }
 }
 

@@ -27,6 +27,7 @@ const getAllChats = async (req, res, next) => {
     res.status(200).json({
         chats,
         totalPages,
+        totalChats,
         pageNum,
         ok: true,
     });

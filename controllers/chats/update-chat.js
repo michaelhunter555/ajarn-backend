@@ -1,6 +1,9 @@
 const Chats = require("../../models/chats");
 const Message = require("../../models/messages");
+const User = require("../../models/users");
 const HttpError = require("../../models/http-error");
+const { getIO, checkRoom, NotificationsList } = require("../../lib/socket");
+const { handleNewMessageEmailNotification } = require("../../lib/brevoHelper");
 
 const updateChat = async (req, res, next) => {
   const { senderId } = req.params;
@@ -41,6 +44,27 @@ const updateChat = async (req, res, next) => {
         chatId,
     })
     await message.save();
+
+    const sender = chat.participantInfo.find((p) => p.id.toString() === senderId.toString())
+    if(checkRoom(senderId)) {
+        const io = getIO();
+        io.to(String(senderId)).emit(NotificationsList.newMessage, {
+            message: text,
+            senderId,
+            chatId: chat._id,
+            userData: {
+                name: sender.name,
+                image: sender.image,
+                userType: sender.userType,
+                id: sender.id,
+            },
+        });
+    } else {
+        const user = await User.findById(senderId).select("name email").lean();
+        if(user) {
+            await handleNewMessageEmailNotification(user.name, user.email, text);
+        }
+    }
 
     res.status(200)
     .json({

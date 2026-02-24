@@ -13,7 +13,25 @@ const checkJobExpiration = require("./controllers/jobs/check-job-expiration");
 const HttpError = require("./models/http-error");
 const cron = require("node-cron");
 const { facebookCallback } = require("./lib/socialMediaBoost");
+const { Server } = require("socket.io");
+const { createServer } = require("http");
+const { setupSocket } = require("./lib/socket");
+
 const app = express();
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  }
+});
+
+io.engine.on('connection_error', (err) => {
+  console.log('Socket.IO server error:', err);
+});
+
+setupSocket(io);
+
 
 app.use((req, res, next) => {
   if (req.originalUrl === "/api/stripe/stripe-webhook") {
@@ -64,7 +82,7 @@ cron.schedule("0 0 * * *", () => {
 mongoose
   .connect(process.env.MONGO_DB_STRING)
   .then(() => {
-    app.listen(process.env.PORT || 5001);
+    server.listen(process.env.PORT || 5001);
     console.log("App is Listening");
   })
   .catch((err) => console.log(err));

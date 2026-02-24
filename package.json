@@ -27,6 +27,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.14",
     "openai": "^6.22.0",
+    "socket.io": "^4.8.3",
     "streamifier": "^0.1.1",
     "stripe": "^15.8.0",
     "twitter-api-v2": "^1.27.0",
