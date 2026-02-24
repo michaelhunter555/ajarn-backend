@@ -45,10 +45,11 @@ const updateChat = async (req, res, next) => {
     })
     await message.save();
 
-    const sender = chat.participantInfo.find((p) => p.id.toString() === senderId.toString())
-    if(checkRoom(senderId)) {
+    const sender = chat.participantInfo.find((p) => p.id.toString() === senderId.toString());
+    const receiver = chat.participantInfo.find((p) => p.id.toString() !== senderId.toString());
+    if(checkRoom(receiver.id)) {
         const io = getIO();
-        io.to(String(senderId)).emit(NotificationsList.newMessage, {
+        io.to(String(receiver.id)).emit(NotificationsList.newMessage, {
             message: text,
             senderId,
             chatId: chat._id,
@@ -60,10 +61,10 @@ const updateChat = async (req, res, next) => {
             },
         });
     } else {
-        const user = await User.findById(senderId).select("name email").lean();
-        if(user) {
-            await handleNewMessageEmailNotification(user.name, user.email, text);
-        }
+        // const user = await User.findById(receiver.id).select("name email").lean();
+        // if(user) {
+        //     await handleNewMessageEmailNotification(sender.name, user.email, text);
+        // }
     }
 
     res.status(200)

@@ -5,6 +5,7 @@ const Job = require("../../models/jobs");
 const Application = require("../../models/application");
 const { validationResult } = require("express-validator");
 const { handleNewApplication } = require("../../lib/brevoHelper");
+const { getIO, checkRoom, NotificationsList } = require("../../lib/socket");
 
 //POST apply to jobs
 const applyToJobById = async (req, res, next) => {
@@ -116,7 +117,17 @@ const applyToJobById = async (req, res, next) => {
     //get the job owner
     const jobOwner = await User.findById(job.creator).select("name email");
     if(jobOwner) {
+      //send email notification to job owner
       await handleNewApplication(jobOwner.name, jobOwner.email, user.name, job.title);
+      //send socket notification to job owner if active on site
+      if(checkRoom(jobOwner._id)) {
+        const io = getIO();
+        io.to(String(jobOwner._id)).emit(NotificationsList.newJobApplications, {
+          applicantName: user.name,
+          image: user.image,
+          jobName: job.title,
+        });
+      }
     }
 
   } catch (err) {

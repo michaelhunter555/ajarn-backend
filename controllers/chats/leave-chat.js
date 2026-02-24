@@ -2,14 +2,17 @@ const Chat = require("../../models/chats");
 const HttpError = require("../../models/http-error");
 
 const leaveChat = async (req, res, next) => {
-  const { chatId } = req.params;
-  const { userType } = req.body;
+  const { userId } = req.params;
+  const { userType, chatId } = req.body;
 
   try {
     const chat = await Chat.findByIdAndUpdate(
         chatId,
         {
             [userType === "teacher" ? "teacherLeftChat" : "employerLeftChat"]: true,
+            chatIsComplete: true,
+            lastMessage: "user left the chat",
+            lastMessageDate: new Date(),
         },
         {
             new: true,

@@ -3,6 +3,7 @@ const Message = require("../../models/messages");
 const User = require("../../models/users");
 const HttpError = require("../../models/http-error");
 const { getIO, checkRoom, NotificationsList } = require("../../lib/socket");
+const { handleNewMessageEmailNotification } = require("../../lib/brevoHelper");
 
 
 const createChat = async (req, res, next) => {
@@ -14,6 +15,21 @@ const createChat = async (req, res, next) => {
     const error = new HttpError(
       "Forbidden - You are not authorized to create a chat with this user.",
       403
+    );
+    return next(error);
+  }
+
+  const totalChats = await Chats.countDocuments({
+    $or: [{ teacherId: senderId }, { employerId: senderId }],
+    chatIsComplete: false,
+    teacherLeftChat: false,
+    employerLeftChat: false,
+  });
+
+  if(totalChats >= 10) {
+    const error = new HttpError(
+      "You have reached the maximum number of chats. Please leave some chats to create a new one.",
+      400
     );
     return next(error);
   }
@@ -65,12 +81,12 @@ const createChat = async (req, res, next) => {
     } else {
         const user = await User.findById(teacherData._id).select("name email").lean();
         if(user) {
-            await handleNewMessageEmailNotification(employerData.name, user.email, message);
+          await handleNewMessageEmailNotification(employerData.name, user.email, message);
         }
-
     }
-    res.status(201).json({ chatId: newChat._id, ok: true });
+    res.status(201).json({ chat: newChat, ok: true });
   } catch (err) {
+    console.log("error", err);
     const error = new HttpError(
       "There was an issue creating the chat.",
       500
@@ -78,7 +94,6 @@ const createChat = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(201).json({ chat: newChat, ok: true });
 };
 
 module.exports = createChat;

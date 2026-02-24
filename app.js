@@ -16,6 +16,7 @@ const { facebookCallback } = require("./lib/socialMediaBoost");
 const { Server } = require("socket.io");
 const { createServer } = require("http");
 const { setupSocket } = require("./lib/socket");
+const chatsCron = require("./controllers/chats/chats-cron");
 
 const app = express();
 const server = createServer(app);
@@ -77,6 +78,7 @@ app.use((error, req, res, next) => {
 cron.schedule("0 0 * * *", () => {
   console.log("midnight job ran.");
   checkJobExpiration();
+  chatsCron();
 });
 
 mongoose
