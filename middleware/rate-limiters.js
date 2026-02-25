@@ -68,7 +68,7 @@ const supportLimiter = createLimiter({
 
 const generateCoverLetterLimiter = createLimiter({
   windowMs: 1 * 24 * 60 * 60 * 1000,
-  max: 12,
+  max: 3,
   message: "Too many cover letter generation requests. Please try again later.",
   keyGenerator: userOrIpKey,
 });
