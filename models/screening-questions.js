@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ScreeningQuestions = new Schema({
+    isPublic: { type: Boolean, required: true, default: false },
     maxTimeAllowed: { type: Number, required: true, default: 0 },
     question: { type: String, required: true },
-    correctAnswer: { type: String, required: false, enum: ["a", "b", "c", "d", "e", "f"] },
+    correctAnswer: { type: String, required: false, },
     answers: { 
         a: { type: String, required: false },
         b: { type: String, required: false },

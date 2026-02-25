@@ -38,6 +38,16 @@ const updateChat = async (req, res, next) => {
         return next(error);
     }
 
+    const employer = await User.findById(chat.employerId).select("buffetIsActive");
+
+    if(employer.buffetIsActive === false) {
+        const error = new HttpError(
+            "The employer's access to teachers has expired.",
+            401
+        );
+        return next(error);
+    }
+
     const message = new Message({
         message: text,
         senderId,

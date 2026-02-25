@@ -2,6 +2,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const path = require("path");
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const jobRoutes = require("./routes/job-routes");
@@ -18,11 +19,21 @@ const { createServer } = require("http");
 const { setupSocket } = require("./lib/socket");
 const chatsCron = require("./controllers/chats/chats-cron");
 
+const allowedOrigins = process.env.NODE_ENV === "production"
+? ["https://ajarnjobs.com"]
+: ["http://localhost:3000"];
+
 const app = express();
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}))
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
   }
 });
@@ -33,32 +44,15 @@ io.engine.on('connection_error', (err) => {
 
 setupSocket(io);
 
+app.use("/api/stripe", stripeRoutes); // add routes!!!
 
-app.use((req, res, next) => {
-  if (req.originalUrl === "/api/stripe/stripe-webhook") {
-    next();
-  } else {
-    bodyParser.json()(req, res, next);
-  }
-});
-
+app.use(bodyParser.json());
 app.get("/api/facebook/callback", facebookCallback);
-
 //app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
-  next();
-});
 app.use("/api/jobs", jobRoutes); // => /api/jobs/...
 app.use("/api/user", userRoutes); // => /api/users/...
 app.use("/api/blog", blogRoutes); // => /api/blog/...
-app.use("/api/stripe", stripeRoutes); // add routes!!!
 app.use("/api/screenings", screeningRoutes);
 
 app.use((req, res, next) => {

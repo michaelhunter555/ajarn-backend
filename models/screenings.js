@@ -11,6 +11,6 @@ const Screenings = new Schema({
   maxTimeAllowed: { type: Number, required: true },
   totalScore: { type: Number, required: true },
   questions: { type: [mongoose.Types.ObjectId], required: true, ref: "ScreeningQuestions" },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model("Screenings", Screenings);

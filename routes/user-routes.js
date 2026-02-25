@@ -41,6 +41,7 @@ const {
   authBootstrapLimiter,
   profileUpdateLimiter,
   supportLimiter,
+  generateCoverLetterLimiter,
 } = require("../middleware/rate-limiters");
 const { check } = require("express-validator");
 const getAllChatMessages = require("../controllers/chats/get-all-chat-messages");
@@ -48,6 +49,7 @@ const updateChat = require("../controllers/chats/update-chat");
 const getAllChats = require("../controllers/chats/get-all-chats");
 const leaveChat = require("../controllers/chats/leave-chat");
 const createChat = require("../controllers/chats/create-chat");
+const generateAICoverLetter = require("../controllers/users/generate-ai-cover-letter");
 //const checkAuth = require("../middleware/auth");
 //const { thaiCities } = require("../dummy_data/ThaiData");
 
@@ -121,11 +123,16 @@ router.get("/get-applications/:userId", requireSelf((req) => req.params.userId),
 
 //GET Employer Recruits
 router.get("/get-employer-recruits/:creatorId", requireSelf((req) => req.params.creatorId), getEmployerRecruits);
+
 //GET applicants by creatorId
 router.get("/applicants/:creatorId", requireSelf((req) => req.params.creatorId), getApplicantsByCreator);
 
 //GET user recruitment Offers (if any)
 router.get("/get-recruitment-offers/:userId", requireSelf((req) => req.params.userId), getUserRecruitments);
+
+// GET - Generate AI Cover Letter
+router.get("/generate-ai-cover-letter/:userId", generateCoverLetterLimiter, requireSelf((req) => req.params.userId), generateAICoverLetter);
+
 
 /* CLOSED POST ROUTE */
 

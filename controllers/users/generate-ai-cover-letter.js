@@ -1,14 +1,13 @@
-const { generateCoverLetter } = require("../../lib/ai-analysis");
 const Users = require("../../models/users");
-const { createGPTClient } = require("../../lib/ai-analysis");
+const { createGPTClient, generateCoverLetter } = require("../../lib/ai-analysis");
 const HttpError = require("../../models/http-error");
 
 const generateAICoverLetter = async (req, res, next) => {
     const { userId } = req.params;
 
     try {
-        const user = await Users.findById(userId).select("workExperience education skills interests");
-        if(req.userDate.userId.toString() !== userId.toString()) {
+        const user = await Users.findById(userId).select("name location workExperience education skill interests highestCertification nationality");
+        if(req.userData?.userId?.toString() !== userId.toString()) {
             return next(new HttpError("Forbidden - You are not authorized to generate an AI cover letter for this user", 403));
         }
 
@@ -17,7 +16,7 @@ const generateAICoverLetter = async (req, res, next) => {
         }
 
         const ai = createGPTClient();
-        const context = generateCoverLetter(user.toObject(), user.workExperience, user.education, user.skills, user.interests);
+        const context = generateCoverLetter(user.toObject());
 
         const response = await ai.chat.completions.create({
             model: "gpt-4o-mini",
@@ -34,11 +33,11 @@ const generateAICoverLetter = async (req, res, next) => {
 
     }
     catch (err) {
+        console.log(err);
         res.status(500).json({
             message: "There was an error with the request to generate an AI cover letter",
             ok: false
         });
-        return next(err);
     }
 }
 

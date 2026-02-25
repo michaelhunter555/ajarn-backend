@@ -26,6 +26,8 @@ const normalizeQuestion = (question) => {
   return {
     question: question?.question || "",
     answers: normalizeAnswers(question?.answers),
+    maxTimeAllowed: Number(question?.maxTimeAllowed) * 1000,
+    isPublic: question?.isPublic || false,
     correctAnswer: question?.correctAnswer || "",
     shortAnswer: question?.shortAnswer || "",
     longAnswer: question?.longAnswer || "",
@@ -90,7 +92,7 @@ try {
       description,
       jobId,
       date,
-      maxTimeAllowed: Number(maxTimeAllowed),
+      maxTimeAllowed: Number(maxTimeAllowed) * 60 * 1000,
       totalScore: Number(computedTotalScore) || 0,
       questions: createdQuestions.map((question) => question._id),
     });

@@ -19,6 +19,15 @@ const createChat = async (req, res, next) => {
     return next(error);
   }
 
+  const user = await User.findById(employerData._id).select("buffetIsActive").lean();
+  if(user.buffetIsActive === false) {
+    const error = new HttpError(
+      "The employer's access to teachers has expired.",
+      401
+    );
+    return next(error);
+  }
+
   const totalChats = await Chats.countDocuments({
     $or: [{ teacherId: senderId }, { employerId: senderId }],
     chatIsComplete: false,
