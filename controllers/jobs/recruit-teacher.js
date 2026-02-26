@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const createDOMPurify = require("dompurify");
 const { JSDOM } = require("jsdom");
 const { handleNewRecruitment } = require("../../lib/brevoHelper");
+const { getIO, NotificationsList, checkRoom } = require("../../lib/socket");
 
 const recruitTeacher = async (req, res, next) => {
   const { recruitment } = req.body;
@@ -16,6 +17,10 @@ const recruitTeacher = async (req, res, next) => {
     );
     return next(nextError);
   }
+  const recruitmentExists = await Recruitment.exists({ teacherId: recruitment.teacherId, jobId: recruitment.jobId });
+  if (recruitmentExists) {
+    return res.status(200).json({ message: "Recruitment offer already sent to this teacher for this job.", ok: true, exists: true });
+  };
 
   const window = new JSDOM("").window;
   const DOMPurify = createDOMPurify(window);
@@ -35,7 +40,7 @@ const recruitTeacher = async (req, res, next) => {
   };
 
   const newRecruitment = new Recruitment(newRecruitmentData);
-
+  const io = getIO();
   let sess;
   try {
     const user = await User.findById(recruitment.userId);
@@ -65,6 +70,7 @@ const recruitTeacher = async (req, res, next) => {
     await sess.commitTransaction();
 
    if(newRecruitment) {
+    //send email notification to teacher
     await handleNewRecruitment(
       teacher.email,
       teacher.name,
@@ -73,7 +79,18 @@ const recruitTeacher = async (req, res, next) => {
       recruitment.salary,
       recruitment.location,
       newRecruitmentData.recruitmentMessage,
-    )
+      newRecruitment.jobId,
+    );
+
+    //send socket notification to teacher if active on site
+    io.to(String(teacher._id)).emit(NotificationsList.newRecruitmentOffer, {
+        jobTitle: recruitment.jobTitle,
+        salary: recruitment.salary,
+        location: recruitment.location,
+        employerName: user.name,
+        employerImage: user.image,
+        recruitmentId: newRecruitment._id,
+      });
  }
     res
       .status(201)

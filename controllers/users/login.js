@@ -6,8 +6,8 @@ const jwt = require("jsonwebtoken");
 
 //POST user login
 const login = async (req, res, next) => {
-  console.log("🔐 Login endpoint hit");
-  console.log("📝 Request body:", req.body);
+  // console.log("🔐 Login endpoint hit");
+  // console.log("📝 Request body:", req.body);
   
   //make sure the user actually enters something
   const errors = validationResult(req);
@@ -23,12 +23,12 @@ const login = async (req, res, next) => {
   let identifiedUser;
 
   try {
-    console.log("🔍 Looking for user with email:", email);
+   // console.log("🔍 Looking for user with email:", email);
     //try to find the user by email
     identifiedUser = await User.findOne({ email: email }).populate(
       "applications"
     );
-    console.log("👤 User found:", !!identifiedUser);
+  //  console.log("👤 User found:", !!identifiedUser);
   } catch (err) {
     console.error("❌ Error finding user:", err);
     const error = new HttpError(
@@ -40,8 +40,8 @@ const login = async (req, res, next) => {
 
   //if user data does not exist, but Firebase verified them, they need to complete signup
   if (!identifiedUser) {
-    console.log("❌ No user found with email:", email);
-    console.log("🔥 Firebase verified user but not in MongoDB - needs to complete signup");
+    // console.log("❌ No user found with email:", email);
+    // console.log("🔥 Firebase verified user but not in MongoDB - needs to complete signup");
     
     // Generate a temporary JWT token for Firebase-verified users
     let tempToken;
@@ -55,7 +55,7 @@ const login = async (req, res, next) => {
         process.env.SECRET_WEB_TOKEN,
         { expiresIn: "1h" }
       );
-      console.log("🎫 Generated temporary JWT token for Firebase user");
+     // console.log("🎫 Generated temporary JWT token for Firebase user");
     } catch (err) {
       console.error("❌ Error generating temporary token:", err);
       const error = new HttpError("Signup completion failed, please try again", 500);
@@ -74,23 +74,23 @@ const login = async (req, res, next) => {
 
   // Handle Firebase Auth login (no password check needed)
   if (firebaseUid) {
-    console.log("🔥 Firebase login attempt");
-    console.log("🔍 Comparing Firebase UIDs - DB:", identifiedUser.firebaseUid, "Request:", firebaseUid);
+   // console.log("🔥 Firebase login attempt");
+   // console.log("🔍 Comparing Firebase UIDs - DB:", identifiedUser.firebaseUid, "Request:", firebaseUid);
     // Verify Firebase UID matches
     if (identifiedUser.firebaseUid !== firebaseUid) {
       console.log("❌ Firebase UID mismatch");
       const error = new HttpError("Firebase authentication failed.", 401);
       return next(error);
     }
-    console.log("✅ Firebase UID matches");
+    // console.log("✅ Firebase UID matches");
   } else if (password) {
-    console.log("🔐 Traditional password login attempt");
+    //console.log("🔐 Traditional password login attempt");
     // Handle traditional password login
     let isValidPass = false;
 
     try {
       isValidPass = await bcrypt.compare(password, identifiedUser.password);
-      console.log("🔍 Password valid:", isValidPass);
+      //console.log("🔍 Password valid:", isValidPass);
     } catch (err) {
       console.error("❌ Error comparing password:", err);
       const error = new HttpError(

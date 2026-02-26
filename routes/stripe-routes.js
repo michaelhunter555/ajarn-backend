@@ -19,6 +19,7 @@ router.post(
 );
 
 //check token for creating checkouts and retrieving billing data.
+router.use(bodyParser.json());
 router.use(checkAuth);
 router.get("/user-billing/:userId", requireSelf((req) => req.params.userId), getUserBillingData);
 router.post(

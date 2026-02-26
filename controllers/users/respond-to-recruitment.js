@@ -1,5 +1,6 @@
 const Recruitment = require("../../models/recruitment");
 const User = require("../../models/users");
+const { getIO, NotificationsList, checkRoom } = require("../../lib/socket");
 
 const recruitmentResponse = async (req, res, next) => {
   const userId = req.params.userId;
@@ -22,6 +23,14 @@ const recruitmentResponse = async (req, res, next) => {
     recruitOffer.response = recruitmentResponse;
 
     await recruitOffer.save();
+    const io = getIO();
+    if(checkRoom(recruitOffer.creatorId)) {
+      io.to(String(recruitOffer.creatorId)).emit(NotificationsList.newRecruitmentResponse, {
+        teacherName: user.name,
+        teacherImage: user.image,
+        teacherResponse: recruitmentResponse,
+      });
+    }
     res
       .status(200)
       .json({ message: "Updated recruitment status successful", ok: true });
