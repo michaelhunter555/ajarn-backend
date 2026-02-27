@@ -95,7 +95,7 @@ router.patch("/post/:bid/comment/dislike/:uid", blogWriteLimiter, requireSelf((r
 
 //PATCH update blog post
 router.patch(
-  "/post/:bid",
+  "/post/:bid/:uid",
   blogWriteLimiter,
   [
     check("title").not().isEmpty(),
@@ -109,7 +109,7 @@ router.patch(
   updateBlogPostById
 );
 
-//PATCH update comment
+//PATCH update comment - NOT ACTIVE
 router.patch(
   "/update-comment/:uid/post/:bid",
   blogWriteLimiter,
@@ -121,9 +121,9 @@ router.patch(
 /*DELETE Routes */
 
 //DELETE delete comment
-router.delete("/delete-comment/:cid/post/:bid", blogWriteLimiter, requireSelf((req) => req.params.uid), deleteComment);
+router.delete("/delete-comment/:cid/post/:bid/:uid", blogWriteLimiter, requireSelf((req) => req.params.uid), deleteComment);
 
 //DELETE delete blog post
-router.delete("/post/:bid", blogWriteLimiter, requireSelf((req) => req.params.uid), deleteBlogPostById);
+router.delete("/post/:bid/:uid", blogWriteLimiter, requireSelf((req) => req.params.uid), deleteBlogPostById);
 
 module.exports = router;

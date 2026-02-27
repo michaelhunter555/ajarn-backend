@@ -148,7 +148,8 @@ const login = async (req, res, next) => {
     buffetEndDate: identifiedUser.buffetEndDate,
     theme: identifiedUser.theme,
     name: identifiedUser.name,
-    needsOnboarding: !identifiedUser.isOnboarded // Flag for frontend
+    needsOnboarding: !identifiedUser.isOnboarded, // Flag for frontend
+    credits: identifiedUser.credits
   });
 };
 

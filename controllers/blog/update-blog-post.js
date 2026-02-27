@@ -38,14 +38,6 @@ const updateBlogPost = async (req, res, next) => {
     return next(error);
   }
 
-  if (blogPost.author._id.toString() !== req.userData.userId) {
-    const error = new HttpError(
-      "You are not authorized to update this post.",
-      401
-    );
-    return next(error);
-  }
-
   const { title, category, postContent } = req.body;
 
   const window = new JSDOM("").window;
