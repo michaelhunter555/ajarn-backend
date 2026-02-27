@@ -138,7 +138,7 @@ router.get("/generate-ai-cover-letter/:userId", generateCoverLetterLimiter, requ
 
 router.post("/user-feedback/:userId", supportLimiter, requireSelf((req) => req.params.userId), postUserFeedback);
 router.post("/toggle-theme/:userId", requireSelf((req) => req.params.userId), toggleUserTheme);
-router.post("/support-email", supportLimiter, requireSelf((req) => req.body.userId), supportEmail);
+router.post("/support-email/:userId", supportLimiter, requireSelf((req) => req.body.userId), supportEmail);
 //POST
 router.post("/recruitment-offer-response/:userId", requireSelf((req) => req.params.userId), recruitmentResponse);
 //POST
