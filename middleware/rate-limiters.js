@@ -73,9 +73,16 @@ const generateCoverLetterLimiter = createLimiter({
   keyGenerator: userOrIpKey,
 });
 
+const aiGenerateJobDescriptionLimiter = createLimiter({
+  windowMs: 1 * 24 * 60 * 60 * 1000,
+  max: 3,
+  message: "Too many AI job description generation requests. Please try again later.",
+  keyGenerator: userOrIpKey,
+});
+
 const jobCreateLimiter = createLimiter({
   windowMs: 30 * 60 * 1000,
-  max: 20,
+  max: 15,
   message: "Too many job creation requests. Please try again later.",
   keyGenerator: userOrIpKey,
 });
@@ -113,4 +120,5 @@ module.exports = {
   billingLimiter,
   blogWriteLimiter,
   generateCoverLetterLimiter,
+  aiGenerateJobDescriptionLimiter,
 };

@@ -15,7 +15,8 @@ const getFeaturedJobs = require("../controllers/jobs/get-featured-jobs");
 const recruitTeacher = require("../controllers/jobs/recruit-teacher");
 const bulkDeleteJobsById = require("../controllers/jobs/bulk-delete-jobs-by-id");
 const reportJobViolation = require("../controllers/jobs/report-job-violation");
-const { jobCreateLimiter, recruitLimiter, supportLimiter } = require("../middleware/rate-limiters");
+const aiGenerateJobDescription = require("../controllers/jobs/ai-generate-job-description");
+const { jobCreateLimiter, recruitLimiter, supportLimiter, aiGenerateJobDescriptionLimiter } = require("../middleware/rate-limiters");
 const { check } = require("express-validator");
 
 const {
@@ -43,7 +44,7 @@ router.get("/:jid", getJobById);
 router.use(checkAuth);
 
 //POST job
-
+router.post("/ai-generate-job-description/:uid", aiGenerateJobDescriptionLimiter, requireSelf((req) => req.params.uid), aiGenerateJobDescription);
 router.post("/recruit-teacher", recruitLimiter, requireSelf((req) => req.body?.recruitment?.userId), recruitTeacher);
 router.post("/job-post-violation", supportLimiter, requireSelf((req) => req.body?.jobViolation?.user), reportJobViolation);
 router.post(

@@ -61,18 +61,14 @@ let partTimeSalaries = [
 
 //desired qualifications
 let coreJobRequirements = [
-  "BA",
-  "BSc",
-  "Certificate",
-  "Diploma",
-  "master's degree",
-  "PGCE",
-  "Phd",
-  "bEd",
-  "CELTA",
-  "DELTA",
-  "MBA",
-  "TEFL",
+  "High School Diploma",
+  "Associate Degree",
+  "Bachelor's Degree",
+  "Master's Degree",
+  "Doctorate (PhD)",
+  "Professional Certification",
+  "TEFL/TESOL Certificate",
+  "Other"
 ];
 
 let blogCategories = [

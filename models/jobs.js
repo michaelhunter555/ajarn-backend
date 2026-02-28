@@ -6,7 +6,7 @@ const jobsSchema = new Schema({
   location: { type: String, required: true },
   image: { type: String, required: true },
   salary: { type: String, required: true },
-  requirements: { type: String, required: true },
+  requirements: { type: String, required: false },
   description: { type: String, required: true },
   datePosted: { type: Date, required: true },
   hours: { type: String, required: true },
