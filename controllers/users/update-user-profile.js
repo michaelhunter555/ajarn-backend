@@ -72,8 +72,6 @@ const updateUserProfile = async (req, res, next) => {
       const imageFile = req.files.image[0];
       const result = await uploadToCloudinary(imageFile.buffer);
       updatedFields.image = result.secure_url;
-      console.log("result", result);
-      console.log("image", updatedFields.image);
     } catch (err) {
       console.log("err", err);
       const error = new HttpError(
