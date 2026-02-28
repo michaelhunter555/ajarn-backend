@@ -14,7 +14,7 @@ const getUsers = async (req, res, next) => {
   if (location) searchProperty.location = location;
   if (nationality) searchProperty.nationality = nationality;
   if (highestCertification) {
-    searchProperty.highestCertification = highestCertification;
+    searchProperty.education = highestCertification;
   }
 
   let user;
